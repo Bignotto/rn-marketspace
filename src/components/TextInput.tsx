@@ -1,7 +1,7 @@
 import { FormControl, IInputProps, Input } from "native-base";
 
 type Props = IInputProps & {
-  error: string;
+  error?: string;
 };
 
 export function TextInput({ error, isInvalid, ...rest }: Props) {
@@ -12,10 +12,10 @@ export function TextInput({ error, isInvalid, ...rest }: Props) {
         h="11"
         px={4}
         borderWidth={0}
-        fontSize="md"
+        fontSize="lg"
         color="gray.700"
         fontFamily="body"
-        placeholderTextColor="gray.300"
+        placeholderTextColor="gray.400"
         _invalid={{
           borderWidth: 1,
           borderColor: "red.500",
@@ -23,7 +23,7 @@ export function TextInput({ error, isInvalid, ...rest }: Props) {
         _focus={{
           bgColor: "gray.100",
           borderWidth: 1,
-          borderColor: "gray.500",
+          borderColor: "gray.400",
           borderRadius: "md",
         }}
         {...rest}

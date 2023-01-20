@@ -1,13 +1,12 @@
-import React from "react";
-import { NativeBaseProvider, Box, Center } from "native-base";
 import {
-  useFonts,
   Karla_400Regular,
   Karla_700Bold,
+  useFonts,
 } from "@expo-google-fonts/karla";
+import { NativeBaseProvider } from "native-base";
 
+import { Routes } from "@routes/index";
 import { THEME } from "./src/theme";
-import { Login } from "./src/screens/Login";
 
 export default function App() {
   let [fontsLoaded] = useFonts({
@@ -19,7 +18,7 @@ export default function App() {
 
   return (
     <NativeBaseProvider theme={THEME}>
-      <Login />
+      <Routes />
     </NativeBaseProvider>
   );
 }
