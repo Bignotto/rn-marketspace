@@ -1,4 +1,5 @@
 import { GenericButton } from "@components/GenericButton";
+import { TextInput } from "@components/TextInput";
 import { Center, ScrollView, Text, VStack } from "native-base";
 
 export function Login() {
@@ -14,7 +15,9 @@ export function Login() {
           </Text>
           <GenericButton title="Solid" variant={"solid"} />
           <GenericButton title="Dark" variant={"dark"} />
-          <GenericButton title="Light" variant={"light"} />
+          <GenericButton title="Light" variant={"light"} mb="4" />
+
+          <TextInput error="Error Message" />
         </Center>
       </VStack>
     </ScrollView>
