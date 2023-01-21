@@ -12,11 +12,56 @@ import {
 import LogoPng from "@assets/LogoSm.png";
 import { GenericButton } from "@components/GenericButton";
 import { useNavigation } from "@react-navigation/native";
+import * as FileSystem from "expo-file-system";
+import * as ImagePicker from "expo-image-picker";
 import { PencilSimpleLine, User } from "phosphor-react-native";
+import { useState } from "react";
+import { TouchableOpacity } from "react-native";
 import { getStatusBarHeight } from "react-native-iphone-x-helper";
 
 export function SignUp() {
   const navigation = useNavigation();
+
+  const [loadingAvatar, setLoadingAvatar] = useState(false);
+  const [userAvatar, setUserAvatar] = useState("");
+
+  async function handleEditAvatar() {
+    setLoadingAvatar(true);
+    try {
+      const selectedImage = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        quality: 1,
+        aspect: [4, 4],
+        allowsEditing: true,
+      });
+
+      if (selectedImage.canceled) {
+        return;
+      }
+
+      if (selectedImage.assets[0].uri) {
+        const photoInfo = await FileSystem.getInfoAsync(
+          selectedImage.assets[0].uri
+        );
+
+        if (photoInfo.size && photoInfo.size / 1024 / 1024 > 2) {
+          console.log("image too big");
+          return;
+
+          // return toast.show({
+          //   title: 'Essa imagem é muito grande. Escolha uma de até 5MB.',
+          //   placement: 'top',
+          //   bgColor: 'red.500'
+          // })
+        }
+
+        setUserAvatar(selectedImage.assets[0].uri);
+      }
+    } catch (error) {
+    } finally {
+      setLoadingAvatar(false);
+    }
+  }
 
   return (
     <ScrollView
@@ -43,6 +88,21 @@ export function SignUp() {
             h={88}
             borderRadius="full"
           >
+            <Center flex={1}>
+              {userAvatar ? (
+                <Image
+                  source={{ uri: userAvatar }}
+                  alt="user avatar image"
+                  h={86}
+                  w={90}
+                  rounded="full"
+                  // borderWidth={3}
+                  // borderColor="#647AC7"
+                />
+              ) : (
+                <User size={54} color="#9F9BA1" />
+              )}
+            </Center>
             <Box
               position="absolute"
               left={16}
@@ -53,12 +113,11 @@ export function SignUp() {
               borderRadius="full"
             >
               <Center flex={1}>
-                <PencilSimpleLine color="#FFFFFF" />
+                <TouchableOpacity onPress={handleEditAvatar}>
+                  <PencilSimpleLine color="#FFFFFF" />
+                </TouchableOpacity>
               </Center>
             </Box>
-            <Center flex={1}>
-              <User size={54} color="#9F9BA1" />
-            </Center>
           </Box>
         </Center>
         <Center mt="4">
