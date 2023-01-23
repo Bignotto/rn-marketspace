@@ -1,8 +1,18 @@
-import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import {
+  createNativeStackNavigator,
+  NativeStackNavigationProp,
+} from "@react-navigation/native-stack";
 import { Login } from "@screens/guest/Login";
 import { SignUp } from "@screens/guest/SignUp";
 
-const { Navigator, Screen } = createNativeStackNavigator();
+type GuestRoutes = {
+  login: undefined;
+  signUp: undefined;
+};
+
+export type GuestRoutesNavigationProps = NativeStackNavigationProp<GuestRoutes>;
+
+const { Navigator, Screen } = createNativeStackNavigator<GuestRoutes>();
 
 export function GuestRoutes() {
   return (

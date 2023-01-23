@@ -10,7 +10,7 @@ import {
 } from "native-base";
 
 import LogoPng from "@assets/LogoSm.png";
-import { GenericButton } from "@components/GenericButton";
+import { GenericButton as Button } from "@components/GenericButton";
 import { useNavigation } from "@react-navigation/native";
 import * as FileSystem from "expo-file-system";
 import * as ImagePicker from "expo-image-picker";
@@ -89,7 +89,7 @@ export function SignUp() {
             borderRadius="full"
           >
             <Center flex={1}>
-              {userAvatar ? (
+              {userAvatar && !loadingAvatar ? (
                 <Image
                   source={{ uri: userAvatar }}
                   alt="user avatar image"
@@ -131,13 +131,13 @@ export function SignUp() {
           <TextInput placeholder="Telefone" mb="4" />
           <TextInput placeholder="Senha" secureTextEntry mb="4" />
           <TextInput placeholder="Confirmar senha" secureTextEntry mb="4" />
-          <GenericButton title="Criar" variant="dark" />
+          <Button title="Criar" variant="dark" />
         </Center>
         <Center pt="16" mb="20">
           <Heading fontSize="xl" mb="4">
             Já tem uma conta?
           </Heading>
-          <GenericButton
+          <Button
             title="Voltar para o login"
             variant="light"
             onPress={() => navigation.goBack()}
