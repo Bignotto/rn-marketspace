@@ -7,11 +7,17 @@ import {
   Heading,
   HStack,
   Image,
+  Input,
   Text,
   useTheme,
   VStack,
 } from "native-base";
-import { ArrowRight, Tag } from "phosphor-react-native";
+import {
+  ArrowRight,
+  MagnifyingGlass,
+  Sliders,
+  Tag,
+} from "phosphor-react-native";
 import { getStatusBarHeight } from "react-native-iphone-x-helper";
 
 const DATA: IProductDTO[] = [
@@ -150,6 +156,33 @@ export function Home() {
             </HStack>
           </HStack>
         </Box>
+        {/* Filter input panel */}
+        <Text mt={30} fontSize="sm">
+          Compre produtos variados
+        </Text>
+        <HStack
+          h={45}
+          backgroundColor="gray.100"
+          borderRadius={6}
+          mt="2"
+          flexDir="row"
+          justifyContent="space-between"
+        >
+          <Input
+            flex={1}
+            px="2"
+            bg="gray.100"
+            borderWidth={0}
+            _focus={{
+              bgColor: "gray.100",
+            }}
+          />
+          <Box flexDir="row" alignItems="center" mr="3" ml="3">
+            <MagnifyingGlass size={20} color={theme.colors.gray[700]} />
+            <Box borderWidth={1} borderColor="gray.500" h="50%" ml="3" mr="3" />
+            <Sliders size={20} color={theme.colors.gray[700]} />
+          </Box>
+        </HStack>
       </VStack>
       <FlatList
         mt="3"
