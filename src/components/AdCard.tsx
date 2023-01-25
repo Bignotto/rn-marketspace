@@ -28,7 +28,9 @@ export function AdCard({ image_uri }: AdCardProps) {
         right="1"
         top="1"
       >
-        <Text color="gray.100">USADO</Text>
+        <Text color="gray.100" fontSize="xs">
+          USADO
+        </Text>
       </Box>
       <Image
         h={100}
@@ -39,10 +41,10 @@ export function AdCard({ image_uri }: AdCardProps) {
           uri: image_uri,
         }}
       />
-      <Text fontSize="md" color="gray.600">
+      <Text fontSize="sm" color="gray.600">
         Gameboy original
       </Text>
-      <Heading fontSize="lg" color="gray.700">
+      <Heading fontSize="md" color="gray.700">
         R$ 300,00
       </Heading>
     </VStack>

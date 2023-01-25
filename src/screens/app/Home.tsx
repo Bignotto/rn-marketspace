@@ -100,10 +100,10 @@ export function Home() {
               borderColor={theme.colors.blue[400]}
             />
             <Box ml="2">
-              <Text fontFamily="body" fontSize="lg">
+              <Text fontFamily="body" fontSize="md">
                 Boas vindas,
               </Text>
-              <Text fontFamily="heading" fontSize="lg">
+              <Text fontFamily="heading" fontSize="md">
                 Thiago
               </Text>
             </Box>
@@ -115,7 +115,7 @@ export function Home() {
 
         {/* User ads panel component */}
         <Box mt="8">
-          <Text fontSize="lg">Seus produtos anunciados para venda</Text>
+          <Text fontSize="md">Seus produtos anunciados para venda</Text>
           <HStack
             mt="3"
             h={66}
@@ -129,14 +129,14 @@ export function Home() {
             <HStack alignItems="center">
               <Tag size={22} color={theme.colors.blue[800]} />
               <Box ml="3">
-                <Heading>4</Heading>
-                <Text>anúncios ativos</Text>
+                <Heading fontSize="md">4</Heading>
+                <Text fontSize="sm">anúncios ativos</Text>
               </Box>
             </HStack>
             <HStack alignItems="center">
               <Text
                 color={theme.colors.blue[800]}
-                fontSize="lg"
+                fontSize="sm"
                 fontWeight="bold"
                 mr="1"
               >

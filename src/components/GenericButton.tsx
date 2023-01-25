@@ -29,7 +29,7 @@ export function GenericButton({ title, variant = "solid", ...rest }: Props) {
     >
       <Text
         fontFamily="heading"
-        fontSize="lg"
+        fontSize="sm"
         color={variant !== "light" ? "gray.100" : "gray.700"}
       >
         {title}
