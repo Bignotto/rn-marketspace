@@ -6,6 +6,7 @@ import {
 import { NativeBaseProvider } from "native-base";
 
 import { Routes } from "@routes/index";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { THEME } from "./src/theme";
 
 export default function App() {
@@ -17,8 +18,10 @@ export default function App() {
   if (!fontsLoaded) return null;
 
   return (
-    <NativeBaseProvider theme={THEME}>
-      <Routes />
-    </NativeBaseProvider>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <NativeBaseProvider theme={THEME}>
+        <Routes />
+      </NativeBaseProvider>
+    </GestureHandlerRootView>
   );
 }
