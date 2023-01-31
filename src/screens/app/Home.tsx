@@ -96,7 +96,7 @@ export function Home() {
 
   const sheetRef = useRef<BottomSheet>(null);
 
-  const snapPoints = useMemo(() => ["2%", "52%"], []);
+  const snapPoints = useMemo(() => ["2%", "55%"], []);
 
   function handleShowModal() {
     if (!filterModalShown) {
@@ -104,7 +104,8 @@ export function Home() {
       setFilterModalShown(true);
     }
     if (filterModalShown) {
-      sheetRef.current?.snapToIndex(0);
+      // sheetRef.current?.snapToIndex(0);
+      sheetRef.current?.close();
       setFilterModalShown(false);
     }
   }
@@ -223,6 +224,8 @@ export function Home() {
         ref={sheetRef}
         snapPoints={snapPoints}
         // onChange={handleSnapPress}
+        enablePanDownToClose={true}
+        onChange={handleShowModal}
       >
         <SearchFilterPanel />
       </BottomSheet>
