@@ -96,15 +96,14 @@ export function Home() {
 
   const sheetRef = useRef<BottomSheet>(null);
 
-  const snapPoints = useMemo(() => ["2%", "55%"], []);
+  const snapPoints = useMemo(() => ["2%", "58%"], []);
 
   function handleShowModal() {
     if (!filterModalShown) {
-      sheetRef.current?.snapToIndex(1);
+      sheetRef.current?.expand();
       setFilterModalShown(true);
     }
     if (filterModalShown) {
-      // sheetRef.current?.snapToIndex(0);
       sheetRef.current?.close();
       setFilterModalShown(false);
     }

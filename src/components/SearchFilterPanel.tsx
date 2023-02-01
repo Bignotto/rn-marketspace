@@ -1,5 +1,6 @@
 import {
   Box,
+  Center,
   Checkbox,
   FormControl,
   HStack,
@@ -8,17 +9,40 @@ import {
   useTheme,
   VStack,
 } from "native-base";
+import { XCircle } from "phosphor-react-native";
 import { useState } from "react";
+import { TouchableOpacity } from "react-native";
 import { GenericButton } from "./GenericButton";
 
 export function SearchFilterPanel() {
   const theme = useTheme();
 
-  const [acceptTrade, setAcceptTrade] = useState(true);
+  const [conditions, setConditions] = useState(["USADO", "NOVO"]);
 
-  function toggleSwitchState(val: boolean) {
-    console.log({ val });
+  const [acceptTrade, setAcceptTrade] = useState(true);
+  const [payMethods, setPayMethods] = useState([]);
+
+  function toggleCondition(val: "USADO" | "NOVO") {
+    if (conditions.includes(val)) {
+      setConditions((c) => c.filter((v) => v !== val));
+      return;
+    }
+
+    setConditions((c) => [val, ...c]);
+  }
+
+  function toggleSwitchState() {
     setAcceptTrade((a) => !a);
+  }
+
+  function handleCheckBox(val: []) {
+    setPayMethods(val);
+  }
+
+  function handleResetFilters() {
+    console.log({ payMethods });
+    setAcceptTrade(false);
+    setPayMethods([]);
   }
 
   return (
@@ -27,11 +51,33 @@ export function SearchFilterPanel() {
         <Text fontSize="xl" fontFamily="heading">
           Filtrar anúncios
         </Text>
-        <Text fontWeight="bold" fontSize="md" mt="6">
+        <Text fontWeight="bold" fontSize="md" mt="6" mb="3">
           Condição
         </Text>
         <HStack>
-          <Text>USADO</Text>
+          <TouchableOpacity onPress={() => toggleCondition("USADO")}>
+            <Center
+              h="7"
+              backgroundColor={
+                conditions.includes("USADO") ? "blue.400" : "gray.200"
+              }
+              px="2"
+              borderRadius="full"
+              flexDir="row"
+            >
+              <Text fontSize="md" fontWeight="bold" color="white" ml="2">
+                USADO
+              </Text>
+              <XCircle
+                weight="fill"
+                color={theme.colors.gray[200]}
+                size={18}
+                style={{
+                  marginLeft: 8,
+                }}
+              />
+            </Center>
+          </TouchableOpacity>
           <Text>NOVO</Text>
         </HStack>
         <Text fontWeight="bold" fontSize="md" mt="6">
@@ -47,23 +93,32 @@ export function SearchFilterPanel() {
           <Text fontWeight="bold" fontSize="md" mt="6">
             Meios de pagamento aceitos
           </Text>
-          <Checkbox value="dinheiro" size="md" mt="3">
-            Dinheiro
-          </Checkbox>
-          <Checkbox value="pix" size="md" mt="2">
-            Pix
-          </Checkbox>
-          <Checkbox value="cc" size="md" mt="2">
-            Cartão de Crédito
-          </Checkbox>
-          <Checkbox value="deposito" size="md" mt="2">
-            Depósito Bancário
-          </Checkbox>
+          <Checkbox.Group onChange={handleCheckBox} value={payMethods}>
+            <Checkbox value="boleto" size="md" mt="3" colorScheme="blue">
+              Boleto
+            </Checkbox>
+            <Checkbox value="dinheiro" size="md" mt="3" colorScheme="blue">
+              Dinheiro
+            </Checkbox>
+            <Checkbox value="pix" size="md" mt="2" colorScheme="blue">
+              Pix
+            </Checkbox>
+            <Checkbox value="cc" size="md" mt="2" colorScheme="blue">
+              Cartão de Crédito
+            </Checkbox>
+            <Checkbox value="deposito" size="md" mt="2" colorScheme="blue">
+              Depósito Bancário
+            </Checkbox>
+          </Checkbox.Group>
         </VStack>
       </VStack>
       <HStack justifyContent="space-between" mb="3">
         <Box w="48%" mr="2">
-          <GenericButton title="Resetar filtros" variant="light" />
+          <GenericButton
+            title="Resetar filtros"
+            variant="light"
+            onPress={handleResetFilters}
+          />
         </Box>
         <Box w="48%" ml="2">
           <GenericButton title="Aplicar filtros" variant="dark" />
