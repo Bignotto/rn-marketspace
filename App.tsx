@@ -6,8 +6,16 @@ import {
 import { NativeBaseProvider } from "native-base";
 
 import { Routes } from "@routes/index";
+import { LogBox } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { THEME } from "./src/theme";
+
+/*
+github.com/GeekyAnts/NativeBase/issues/5098#issuecomment-1193441535
+*/
+LogBox.ignoreLogs([
+  "We can not support a function callback. See Github Issues for details https://github.com/adobe/react-spectrum/issues/2320",
+]);
 
 export default function App() {
   let [fontsLoaded] = useFonts({

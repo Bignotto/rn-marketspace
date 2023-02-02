@@ -21,23 +21,26 @@ const { Navigator, Screen } = createBottomTabNavigator<AppRoutes>();
 export function AppRoutes() {
   const theme = useTheme();
   return (
-    <Navigator screenOptions={{ headerShown: false, tabBarShowLabel: false }}>
+    <Navigator
+      screenOptions={{
+        headerShown: false,
+        tabBarShowLabel: false,
+        tabBarActiveTintColor: theme.colors.blue[800],
+        tabBarInactiveTintColor: theme.colors.gray[600],
+      }}
+    >
       <Screen
         name="home"
         component={Home}
         options={{
-          tabBarIcon: ({ color }) => (
-            <House size={24} color={theme.colors.gray[600]} />
-          ),
+          tabBarIcon: ({ color }) => <House size={24} color={color} />,
         }}
       />
       <Screen
         name="userAds"
         component={UserAds}
         options={{
-          tabBarIcon: ({ color }) => (
-            <Tag size={24} color={theme.colors.gray[600]} />
-          ),
+          tabBarIcon: ({ color }) => <Tag size={24} color={color} />,
         }}
       />
       <Screen
@@ -49,6 +52,15 @@ export function AppRoutes() {
           ),
         }}
       />
+      {/* 
+      TODO: implement ad create screen
+      <Screen
+        name="signOut"
+        component={SignOutScreen}
+        options={{
+          tabBarButton: () => null,
+        }}
+      /> */}
     </Navigator>
   );
 }

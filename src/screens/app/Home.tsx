@@ -1,6 +1,8 @@
 import { AdCard } from "@components/AdCard";
 import { GenericButton } from "@components/GenericButton";
+import { SearchFilterPanel } from "@components/SearchFilterPanel";
 import { IProductDTO } from "@dtos/IProductDTO";
+import BottomSheet from "@gorhom/bottom-sheet";
 import {
   Box,
   FlatList,
@@ -18,6 +20,8 @@ import {
   Sliders,
   Tag,
 } from "phosphor-react-native";
+import { useMemo, useRef, useState } from "react";
+import { TouchableOpacity } from "react-native-gesture-handler";
 import { getStatusBarHeight } from "react-native-iphone-x-helper";
 
 const DATA: IProductDTO[] = [
@@ -87,6 +91,23 @@ const DATA: IProductDTO[] = [
 
 export function Home() {
   const theme = useTheme();
+
+  const [filterModalShown, setFilterModalShown] = useState(false);
+
+  const sheetRef = useRef<BottomSheet>(null);
+
+  const snapPoints = useMemo(() => ["2%", "58%"], []);
+
+  function handleShowModal() {
+    if (!filterModalShown) {
+      sheetRef.current?.expand();
+      setFilterModalShown(true);
+    }
+    if (filterModalShown) {
+      sheetRef.current?.close();
+      setFilterModalShown(false);
+    }
+  }
 
   return (
     <>
@@ -180,7 +201,9 @@ export function Home() {
           <Box flexDir="row" alignItems="center" mr="3" ml="3">
             <MagnifyingGlass size={20} color={theme.colors.gray[700]} />
             <Box borderWidth={1} borderColor="gray.500" h="50%" ml="3" mr="3" />
-            <Sliders size={20} color={theme.colors.gray[700]} />
+            <TouchableOpacity onPress={handleShowModal}>
+              <Sliders size={20} color={theme.colors.gray[700]} />
+            </TouchableOpacity>
           </Box>
         </HStack>
       </VStack>
@@ -196,6 +219,15 @@ export function Home() {
         )}
         keyExtractor={(item) => item.id}
       />
+      <BottomSheet
+        ref={sheetRef}
+        snapPoints={snapPoints}
+        // onChange={handleSnapPress}
+        enablePanDownToClose={true}
+        onChange={handleShowModal}
+      >
+        <SearchFilterPanel />
+      </BottomSheet>
     </>
   );
 }
