@@ -1,4 +1,5 @@
 import { Center, ScrollView, Text, VStack } from "native-base";
+import { getStatusBarHeight } from "react-native-iphone-x-helper";
 
 export function UserAds() {
   return (
@@ -7,9 +8,9 @@ export function UserAds() {
       showsVerticalScrollIndicator={false}
     >
       <VStack flex={1}>
-        <Center flex={1}>
-          <Text fontFamily={"heading"} fontSize="3xl" color={"darkText"}>
-            User Ads
+        <Center marginTop={getStatusBarHeight() + 36}>
+          <Text fontFamily={"heading"} fontSize={20} color={"darkText"}>
+            Meus anúncios
           </Text>
         </Center>
       </VStack>
