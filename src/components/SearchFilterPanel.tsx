@@ -43,6 +43,7 @@ export function SearchFilterPanel() {
     console.log({ payMethods });
     setAcceptTrade(false);
     setPayMethods([]);
+    setConditions([]);
   }
 
   return (
@@ -61,24 +62,63 @@ export function SearchFilterPanel() {
               backgroundColor={
                 conditions.includes("USADO") ? "blue.400" : "gray.200"
               }
-              px="2"
+              px="4"
               borderRadius="full"
               flexDir="row"
             >
-              <Text fontSize="md" fontWeight="bold" color="white" ml="2">
+              <Text
+                fontSize="md"
+                fontWeight="bold"
+                color={conditions.includes("USADO") ? "white" : "gray.500"}
+              >
                 USADO
               </Text>
-              <XCircle
-                weight="fill"
-                color={theme.colors.gray[200]}
-                size={18}
-                style={{
-                  marginLeft: 8,
-                }}
-              />
+              {conditions.includes("USADO") && (
+                <XCircle
+                  weight="fill"
+                  color={theme.colors.gray[200]}
+                  size={18}
+                  style={{
+                    marginLeft: 8,
+                    marginRight: -8,
+                  }}
+                />
+              )}
             </Center>
           </TouchableOpacity>
-          <Text>NOVO</Text>
+          <TouchableOpacity
+            onPress={() => toggleCondition("NOVO")}
+            style={{ marginLeft: 8 }}
+          >
+            <Center
+              h="7"
+              backgroundColor={
+                conditions.includes("NOVO") ? "blue.400" : "gray.200"
+              }
+              px="4"
+              borderRadius="full"
+              flexDir="row"
+            >
+              <Text
+                fontSize="md"
+                fontWeight="bold"
+                color={conditions.includes("NOVO") ? "white" : "gray.500"}
+              >
+                NOVO
+              </Text>
+              {conditions.includes("NOVO") && (
+                <XCircle
+                  weight="fill"
+                  color={theme.colors.gray[200]}
+                  size={18}
+                  style={{
+                    marginLeft: 8,
+                    marginRight: -8,
+                  }}
+                />
+              )}
+            </Center>
+          </TouchableOpacity>
         </HStack>
         <Text fontWeight="bold" fontSize="md" mt="6">
           Aceita troca?
@@ -90,7 +130,7 @@ export function SearchFilterPanel() {
           value={acceptTrade}
         />
         <VStack>
-          <Text fontWeight="bold" fontSize="md" mt="6">
+          <Text fontWeight="bold" fontSize="md" mt="4">
             Meios de pagamento aceitos
           </Text>
           <Checkbox.Group onChange={handleCheckBox} value={payMethods}>
