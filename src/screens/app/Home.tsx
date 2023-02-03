@@ -92,11 +92,11 @@ const DATA: IProductDTO[] = [
 export function Home() {
   const theme = useTheme();
 
-  const [filterModalShown, setFilterModalShown] = useState(false);
+  const [filterModalShown, setFilterModalShown] = useState(true);
 
   const sheetRef = useRef<BottomSheet>(null);
 
-  const snapPoints = useMemo(() => ["2%", "58%"], []);
+  const snapPoints = useMemo(() => ["1%", "58%"], []);
 
   function handleShowModal() {
     if (!filterModalShown) {
@@ -222,7 +222,6 @@ export function Home() {
       <BottomSheet
         ref={sheetRef}
         snapPoints={snapPoints}
-        // onChange={handleSnapPress}
         enablePanDownToClose={true}
         onChange={handleShowModal}
       >
