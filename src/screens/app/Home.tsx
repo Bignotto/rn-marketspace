@@ -215,7 +215,12 @@ export function Home() {
         flex={1}
         data={DATA}
         renderItem={({ item }) => (
-          <AdCard image_uri={item.product_images[0].path} />
+          <AdCard
+            image_uri={item.product_images[0].path}
+            name={item.name}
+            price={`R$ ${item.price}`}
+            showAvatar
+          />
         )}
         keyExtractor={(item) => item.id}
       />

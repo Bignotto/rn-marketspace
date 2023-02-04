@@ -7,7 +7,6 @@ import {
   HStack,
   Select,
   Text,
-  useTheme,
   VStack,
 } from "native-base";
 import { useState } from "react";
@@ -29,7 +28,7 @@ const DATA: IProductDTO[] = [
       email: "desafio@rocketseat.com.br",
       tel: "+5511915839648",
     },
-    is_active: true,
+    is_active: false,
     created_at: "2023-01-21T22:03:52.752Z",
     updated_at: "2023-01-21T22:03:52.752Z",
     product_images: [
@@ -79,14 +78,16 @@ const DATA: IProductDTO[] = [
 ];
 
 export function UserAds() {
-  const theme = useTheme();
   const [filter, setFilter] = useState("all");
 
+  const dataToShow =
+    filter === "all"
+      ? DATA.filter((i) => i.id !== "tudo")
+      : filter === "active"
+      ? DATA.filter((i) => i.is_active)
+      : DATA.filter((i) => !i.is_active);
+
   return (
-    // <ScrollView
-    //   contentContainerStyle={{ flexGrow: 1 }}
-    //   showsVerticalScrollIndicator={false}
-    // >
     <VStack flex={1} px={10}>
       <Center marginTop={getStatusBarHeight() + 36}>
         <Text fontFamily={"heading"} fontSize={20} color={"darkText"}>
@@ -115,13 +116,17 @@ export function UserAds() {
         columnWrapperStyle={{ justifyContent: "space-between" }}
         numColumns={2}
         flex={1}
-        data={DATA}
+        data={dataToShow}
         renderItem={({ item }) => (
-          <AdCard image_uri={item.product_images[0].path} />
+          <AdCard
+            image_uri={item.product_images[0].path}
+            name={item.name}
+            price={`R$ ${item.price.toFixed(2)}`}
+            isActive={item.is_active}
+          />
         )}
         keyExtractor={(item) => item.id}
       />
     </VStack>
-    // </ScrollView>
   );
 }
