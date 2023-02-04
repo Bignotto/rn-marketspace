@@ -33,14 +33,26 @@ export function AppRoutes() {
         name="home"
         component={Home}
         options={{
-          tabBarIcon: ({ color }) => <House size={24} color={color} />,
+          tabBarIcon: ({ color }) => (
+            <House
+              size={24}
+              color={color}
+              weight={color === theme.colors.blue[800] ? "bold" : "regular"}
+            />
+          ),
         }}
       />
       <Screen
         name="userAds"
         component={UserAds}
         options={{
-          tabBarIcon: ({ color }) => <Tag size={24} color={color} />,
+          tabBarIcon: ({ color }) => (
+            <Tag
+              size={24}
+              color={color}
+              weight={color === theme.colors.blue[800] ? "bold" : "regular"}
+            />
+          ),
         }}
       />
       <Screen
@@ -48,7 +60,11 @@ export function AppRoutes() {
         component={SignOutScreen}
         options={{
           tabBarIcon: ({ color }) => (
-            <SignOut size={24} color={theme.colors.red[500]} />
+            <SignOut
+              size={24}
+              color={theme.colors.red[500]}
+              weight={color === theme.colors.blue[800] ? "bold" : "regular"}
+            />
           ),
         }}
       />

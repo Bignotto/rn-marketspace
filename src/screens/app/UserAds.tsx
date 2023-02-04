@@ -82,7 +82,7 @@ export function UserAds() {
 
   const dataToShow =
     filter === "all"
-      ? DATA.filter((i) => i.id !== "tudo")
+      ? DATA.map((i) => i)
       : filter === "active"
       ? DATA.filter((i) => i.is_active)
       : DATA.filter((i) => !i.is_active);
