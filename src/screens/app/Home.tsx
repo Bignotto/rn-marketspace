@@ -92,11 +92,11 @@ const DATA: IProductDTO[] = [
 export function Home() {
   const theme = useTheme();
 
-  const [filterModalShown, setFilterModalShown] = useState(false);
+  const [filterModalShown, setFilterModalShown] = useState(true);
 
   const sheetRef = useRef<BottomSheet>(null);
 
-  const snapPoints = useMemo(() => ["2%", "58%"], []);
+  const snapPoints = useMemo(() => ["1%", "58%"], []);
 
   function handleShowModal() {
     if (!filterModalShown) {
@@ -215,14 +215,18 @@ export function Home() {
         flex={1}
         data={DATA}
         renderItem={({ item }) => (
-          <AdCard image_uri={item.product_images[0].path} />
+          <AdCard
+            image_uri={item.product_images[0].path}
+            name={item.name}
+            price={`R$ ${item.price}`}
+            showAvatar
+          />
         )}
         keyExtractor={(item) => item.id}
       />
       <BottomSheet
         ref={sheetRef}
         snapPoints={snapPoints}
-        // onChange={handleSnapPress}
         enablePanDownToClose={true}
         onChange={handleShowModal}
       >

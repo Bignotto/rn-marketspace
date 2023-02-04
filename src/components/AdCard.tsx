@@ -2,22 +2,37 @@ import { Box, Heading, Image, Text, VStack } from "native-base";
 
 type AdCardProps = {
   image_uri: string;
+  name: string;
+  price: string;
+  showAvatar?: boolean;
+  isActive?: boolean;
 };
 
-export function AdCard({ image_uri }: AdCardProps) {
+export function AdCard({
+  image_uri,
+  name,
+  price,
+  showAvatar = false,
+  isActive = true,
+}: AdCardProps) {
   return (
     <VStack h={143}>
-      <Image
-        alt="user avatar image"
-        zIndex={2}
-        position="absolute"
-        top="1"
-        left="1"
-        w={28}
-        h={28}
-        borderRadius="full"
-        source={{ uri: "https://avatars.githubusercontent.com/u/2911353?v=4" }}
-      />
+      {showAvatar && (
+        <Image
+          alt="user avatar image"
+          zIndex={2}
+          position="absolute"
+          top="1"
+          left="1"
+          w={28}
+          h={28}
+          borderRadius="full"
+          source={{
+            uri: "https://avatars.githubusercontent.com/u/2911353?v=4",
+          }}
+        />
+      )}
+
       <Box
         position="absolute"
         zIndex={2}
@@ -32,6 +47,30 @@ export function AdCard({ image_uri }: AdCardProps) {
           USADO
         </Text>
       </Box>
+      {!isActive && (
+        <>
+          <Box
+            position="absolute"
+            h={100}
+            w={153}
+            opacity={0.5}
+            zIndex={3}
+            backgroundColor="black"
+            borderRadius={6}
+          />
+          <Text
+            position="absolute"
+            zIndex={3}
+            fontFamily="heading"
+            fontSize="xs"
+            color="white"
+            bottom="12"
+            left="2"
+          >
+            ANÚNCIO DESATIVADO
+          </Text>
+        </>
+      )}
       <Image
         h={100}
         w={153}
@@ -41,11 +80,11 @@ export function AdCard({ image_uri }: AdCardProps) {
           uri: image_uri,
         }}
       />
-      <Text fontSize="sm" color="gray.600">
-        Gameboy original
+      <Text fontSize="sm" color="gray.600" numberOfLines={1}>
+        {name}
       </Text>
       <Heading fontSize="md" color="gray.700">
-        R$ 300,00
+        {price}
       </Heading>
     </VStack>
   );
