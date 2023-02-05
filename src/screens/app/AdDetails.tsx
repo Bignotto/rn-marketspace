@@ -37,9 +37,7 @@ export function AdDetails() {
         </Box>
       </VStack>
 
-      <Box>
-        <AdImagesList images={SAMPLE_IMAGES} />
-      </Box>
+      <AdImagesList images={SAMPLE_IMAGES} />
 
       <ScrollView
         contentContainerStyle={{ flexGrow: 1 }}
