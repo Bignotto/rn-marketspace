@@ -2,6 +2,7 @@ import {
   BottomTabNavigationProp,
   createBottomTabNavigator,
 } from "@react-navigation/bottom-tabs";
+import { AdDetails } from "@screens/app/AdDetails";
 import { Home } from "@screens/app/Home";
 import { SignOut as SignOutScreen } from "@screens/app/SignOut";
 import { UserAds } from "@screens/app/UserAds";
@@ -12,6 +13,7 @@ type AppRoutes = {
   home: undefined;
   userAds: undefined;
   signOut: undefined;
+  adDetails: undefined;
 };
 
 export type AppNavigationRoutesProps = BottomTabNavigationProp<AppRoutes>;
@@ -68,15 +70,14 @@ export function AppRoutes() {
           ),
         }}
       />
-      {/* 
-      TODO: implement ad create screen
+
       <Screen
-        name="signOut"
-        component={SignOutScreen}
+        name="adDetails"
+        component={AdDetails}
         options={{
           tabBarButton: () => null,
         }}
-      /> */}
+      />
     </Navigator>
   );
 }

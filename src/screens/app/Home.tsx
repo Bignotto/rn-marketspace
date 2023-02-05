@@ -3,6 +3,8 @@ import { GenericButton } from "@components/GenericButton";
 import { SearchFilterPanel } from "@components/SearchFilterPanel";
 import { IProductDTO } from "@dtos/IProductDTO";
 import BottomSheet from "@gorhom/bottom-sheet";
+import { useNavigation } from "@react-navigation/native";
+import { AppNavigationRoutesProps } from "@routes/app.routes";
 import {
   Box,
   FlatList,
@@ -91,10 +93,10 @@ const DATA: IProductDTO[] = [
 
 export function Home() {
   const theme = useTheme();
+  const navigation = useNavigation<AppNavigationRoutesProps>();
+  const sheetRef = useRef<BottomSheet>(null);
 
   const [filterModalShown, setFilterModalShown] = useState(true);
-
-  const sheetRef = useRef<BottomSheet>(null);
 
   const snapPoints = useMemo(() => ["1%", "58%"], []);
 
@@ -136,7 +138,11 @@ export function Home() {
             </Box>
           </HStack>
           <Box w="40%">
-            <GenericButton title="+ Criar Anúncio" variant="dark" />
+            <GenericButton
+              title="+ Criar Anúncio"
+              variant="dark"
+              onPress={() => navigation.navigate("adDetails")}
+            />
           </Box>
         </HStack>
 
