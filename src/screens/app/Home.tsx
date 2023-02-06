@@ -1,6 +1,7 @@
 import { AdCard } from "@components/AdCard";
 import { GenericButton } from "@components/GenericButton";
 import { SearchFilterPanel } from "@components/SearchFilterPanel";
+import { UserAvatar } from "@components/UserAvatar";
 import { IProductDTO } from "@dtos/IProductDTO";
 import BottomSheet from "@gorhom/bottom-sheet";
 import { useNavigation } from "@react-navigation/native";
@@ -10,7 +11,6 @@ import {
   FlatList,
   Heading,
   HStack,
-  Image,
   Input,
   Text,
   useTheme,
@@ -117,16 +117,9 @@ export function Home() {
       <VStack px={10}>
         <HStack mt={getStatusBarHeight() + 20} justifyContent="space-between">
           <HStack w="60%">
-            <Image
-              alt="user avatar image"
-              source={{
-                uri: "https://avatars.githubusercontent.com/u/2911353?v=4",
-              }}
-              h={45}
-              w={45}
-              borderRadius={23}
-              borderWidth={3}
-              borderColor={theme.colors.blue[400]}
+            <UserAvatar
+              avatar_uri="https://avatars.githubusercontent.com/u/2911353?v=4"
+              size={45}
             />
             <Box ml="2">
               <Text fontFamily="body" fontSize="md">
