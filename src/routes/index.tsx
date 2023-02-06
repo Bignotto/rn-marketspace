@@ -1,6 +1,6 @@
 import { DefaultTheme, NavigationContainer } from "@react-navigation/native";
 import { Box, useTheme } from "native-base";
-import { AppRoutes } from "./app.routes";
+import { AdsRoutes } from "./ads.routes";
 
 //BIG: implement refresh token
 
@@ -13,7 +13,7 @@ export function Routes() {
   return (
     <Box flex={1} bg="gray.200">
       <NavigationContainer theme={theme}>
-        <AppRoutes />
+        <AdsRoutes />
       </NavigationContainer>
     </Box>
   );

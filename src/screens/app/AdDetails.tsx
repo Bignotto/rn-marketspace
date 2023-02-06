@@ -2,7 +2,7 @@ import { AdImagesList } from "@components/AdImagesList";
 import { GenericButton } from "@components/GenericButton";
 import { UserAvatar } from "@components/UserAvatar";
 import { useNavigation } from "@react-navigation/native";
-import { AppNavigationRoutesProps } from "@routes/app.routes";
+import { AdsRoutesNavigationProps } from "@routes/ads.routes";
 import { Box, HStack, ScrollView, Text, VStack } from "native-base";
 import {
   ArrowLeft,
@@ -35,7 +35,7 @@ const SAMPLE_IMAGES = [
 ];
 
 export function AdDetails() {
-  const navigation = useNavigation<AppNavigationRoutesProps>();
+  const navigation = useNavigation<AdsRoutesNavigationProps>();
   return (
     <>
       <VStack mb="3">

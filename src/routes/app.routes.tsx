@@ -2,7 +2,6 @@ import {
   BottomTabNavigationProp,
   createBottomTabNavigator,
 } from "@react-navigation/bottom-tabs";
-import { AdDetails } from "@screens/app/AdDetails";
 import { Home } from "@screens/app/Home";
 import { SignOut as SignOutScreen } from "@screens/app/SignOut";
 import { UserAds } from "@screens/app/UserAds";
@@ -68,14 +67,6 @@ export function AppRoutes() {
               weight={color === theme.colors.blue[800] ? "bold" : "regular"}
             />
           ),
-        }}
-      />
-
-      <Screen
-        name="adDetails"
-        component={AdDetails}
-        options={{
-          tabBarButton: () => null,
         }}
       />
     </Navigator>

@@ -5,7 +5,7 @@ import { UserAvatar } from "@components/UserAvatar";
 import { IProductDTO } from "@dtos/IProductDTO";
 import BottomSheet from "@gorhom/bottom-sheet";
 import { useNavigation } from "@react-navigation/native";
-import { AppNavigationRoutesProps } from "@routes/app.routes";
+import { AdsRoutesNavigationProps } from "@routes/ads.routes";
 import {
   Box,
   FlatList,
@@ -93,7 +93,7 @@ const DATA: IProductDTO[] = [
 
 export function Home() {
   const theme = useTheme();
-  const navigation = useNavigation<AppNavigationRoutesProps>();
+  const navigation = useNavigation<AdsRoutesNavigationProps>();
   const sheetRef = useRef<BottomSheet>(null);
 
   const [filterModalShown, setFilterModalShown] = useState(true);
