@@ -134,7 +134,7 @@ export function Home() {
             <GenericButton
               title="+ Criar Anúncio"
               variant="dark"
-              onPress={() => navigation.navigate("adDetails")}
+              onPress={() => navigation.navigate("createAd")}
             />
           </Box>
         </HStack>
