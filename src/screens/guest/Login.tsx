@@ -4,10 +4,11 @@ import { Center, Heading, Image, ScrollView, VStack } from "native-base";
 import LogoPng from "@assets/logo.png";
 import { GenericButton } from "@components/GenericButton";
 import { useNavigation } from "@react-navigation/native";
+import { GuestRoutesNavigationProps } from "@routes/guest.routes";
 import { getStatusBarHeight } from "react-native-iphone-x-helper";
 
 export function Login() {
-  const navigation = useNavigation();
+  const navigation = useNavigation<GuestRoutesNavigationProps>();
 
   function handleNavigateSignUp() {
     navigation.navigate("signUp");

@@ -1,14 +1,16 @@
 import { AdCard } from "@components/AdCard";
 import { GenericButton } from "@components/GenericButton";
 import { SearchFilterPanel } from "@components/SearchFilterPanel";
+import { UserAvatar } from "@components/UserAvatar";
 import { IProductDTO } from "@dtos/IProductDTO";
 import BottomSheet from "@gorhom/bottom-sheet";
+import { useNavigation } from "@react-navigation/native";
+import { AdsRoutesNavigationProps } from "@routes/ads.routes";
 import {
   Box,
   FlatList,
   Heading,
   HStack,
-  Image,
   Input,
   Text,
   useTheme,
@@ -91,10 +93,10 @@ const DATA: IProductDTO[] = [
 
 export function Home() {
   const theme = useTheme();
+  const navigation = useNavigation<AdsRoutesNavigationProps>();
+  const sheetRef = useRef<BottomSheet>(null);
 
   const [filterModalShown, setFilterModalShown] = useState(true);
-
-  const sheetRef = useRef<BottomSheet>(null);
 
   const snapPoints = useMemo(() => ["1%", "58%"], []);
 
@@ -115,16 +117,9 @@ export function Home() {
       <VStack px={10}>
         <HStack mt={getStatusBarHeight() + 20} justifyContent="space-between">
           <HStack w="60%">
-            <Image
-              alt="user avatar image"
-              source={{
-                uri: "https://avatars.githubusercontent.com/u/2911353?v=4",
-              }}
-              h={45}
-              w={45}
-              borderRadius={23}
-              borderWidth={3}
-              borderColor={theme.colors.blue[400]}
+            <UserAvatar
+              avatar_uri="https://avatars.githubusercontent.com/u/2911353?v=4"
+              size={45}
             />
             <Box ml="2">
               <Text fontFamily="body" fontSize="md">
@@ -136,7 +131,11 @@ export function Home() {
             </Box>
           </HStack>
           <Box w="40%">
-            <GenericButton title="+ Criar Anúncio" variant="dark" />
+            <GenericButton
+              title="+ Criar Anúncio"
+              variant="dark"
+              onPress={() => navigation.navigate("adDetails")}
+            />
           </Box>
         </HStack>
 
