@@ -26,6 +26,7 @@ export function CreateAd() {
   const theme = useTheme();
 
   const [adImages, setAdImages] = useState<ImagePicker.ImagePickerAsset[]>([]);
+  const [acceptTrade, setAcceptTrade] = useState(true);
   const [payMethods, setPayMethods] = useState([]);
 
   async function handleImageSelect() {
@@ -48,6 +49,10 @@ export function CreateAd() {
 
   function handleCheckBox(val: []) {
     setPayMethods(val);
+  }
+
+  function toggleSwitchState() {
+    setAcceptTrade((a) => !a);
   }
 
   return (
@@ -191,8 +196,8 @@ export function CreateAd() {
           <Switch
             size="md"
             onTrackColor="blue.400"
-            // onToggle={toggleSwitchState}
-            // value={acceptTrade}
+            onToggle={toggleSwitchState}
+            value={acceptTrade}
           />
         </Box>
 
@@ -230,7 +235,7 @@ export function CreateAd() {
           title="Cancelar"
           width={160}
           variant="light"
-          onPress={() => console.log({ payMethods })}
+          onPress={() => console.log({ payMethods, acceptTrade })}
         />
         <GenericButton title="Avançar" width={160} variant="dark" />
       </HStack>
