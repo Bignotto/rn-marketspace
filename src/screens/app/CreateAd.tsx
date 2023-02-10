@@ -26,6 +26,7 @@ export function CreateAd() {
   const theme = useTheme();
 
   const [adImages, setAdImages] = useState<ImagePicker.ImagePickerAsset[]>([]);
+  const [payMethods, setPayMethods] = useState([]);
 
   async function handleImageSelect() {
     const selectedImages = await ImagePicker.launchImageLibraryAsync({
@@ -43,6 +44,10 @@ export function CreateAd() {
   function handleRemoveImage(uri: string) {
     const filtered = adImages.filter((img) => img.uri !== uri);
     setAdImages(filtered);
+  }
+
+  function handleCheckBox(val: []) {
+    setPayMethods(val);
   }
 
   return (
@@ -72,7 +77,7 @@ export function CreateAd() {
 
         <HStack mt="3">
           {adImages.map((img) => (
-            <Box>
+            <Box key={img.uri}>
               <Image
                 alt="user product image"
                 w={100}
@@ -195,9 +200,7 @@ export function CreateAd() {
           <Text fontFamily={"heading"} fontSize="md" color={"gray.700"} mt="4">
             Meios de pagamento aceitos
           </Text>
-          <Checkbox.Group
-          // onChange={handleCheckBox} value={payMethods}
-          >
+          <Checkbox.Group onChange={handleCheckBox} value={payMethods}>
             <Checkbox value="boleto" size="md" mt="3" colorScheme="blue">
               Boleto
             </Checkbox>
@@ -223,7 +226,12 @@ export function CreateAd() {
         justifyContent="space-between"
         px={10}
       >
-        <GenericButton title="Cancelar" width={160} variant="light" />
+        <GenericButton
+          title="Cancelar"
+          width={160}
+          variant="light"
+          onPress={() => console.log({ payMethods })}
+        />
         <GenericButton title="Avançar" width={160} variant="dark" />
       </HStack>
     </>
