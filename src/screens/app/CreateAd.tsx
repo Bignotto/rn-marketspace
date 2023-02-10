@@ -2,23 +2,48 @@ import { GenericButton } from "@components/GenericButton";
 import { TextInput } from "@components/TextInput";
 import { useNavigation } from "@react-navigation/native";
 import { AdsRoutesNavigationProps } from "@routes/ads.routes";
+import * as ImagePicker from "expo-image-picker";
 import {
   Box,
   Checkbox,
   HStack,
+  Image,
   Radio,
   ScrollView,
   Switch,
   Text,
   TextArea,
+  useTheme,
   VStack,
 } from "native-base";
-import { ArrowLeft } from "phosphor-react-native";
+import { ArrowLeft, Plus, XCircle } from "phosphor-react-native";
+import { useState } from "react";
 import { TouchableOpacity } from "react-native";
 import { getStatusBarHeight } from "react-native-iphone-x-helper";
 
 export function CreateAd() {
   const navigation = useNavigation<AdsRoutesNavigationProps>();
+  const theme = useTheme();
+
+  const [adImages, setAdImages] = useState<ImagePicker.ImagePickerAsset[]>([]);
+
+  async function handleImageSelect() {
+    const selectedImages = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      quality: 1,
+      aspect: [4, 4],
+      allowsEditing: true,
+    });
+
+    if (selectedImages.canceled) return;
+
+    setAdImages((act) => [...act, selectedImages.assets[0]]);
+  }
+
+  function handleRemoveImage(uri: string) {
+    const filtered = adImages.filter((img) => img.uri !== uri);
+    setAdImages(filtered);
+  }
 
   return (
     <>
@@ -35,12 +60,7 @@ export function CreateAd() {
         </Text>
         <Box w={5} />
       </HStack>
-      <ScrollView
-        // contentContainerStyle={{ flexGrow: 1 }}
-        showsVerticalScrollIndicator={false}
-        px={10}
-        mt="3"
-      >
+      <ScrollView showsVerticalScrollIndicator={false} px={10} mt="3">
         <VStack flex={1}>
           <Text fontFamily={"heading"} fontSize="md" color={"gray.700"}>
             Imagens
@@ -50,9 +70,54 @@ export function CreateAd() {
           </Text>
         </VStack>
 
-        {/* image picker */}
+        <HStack mt="3">
+          {adImages.map((img) => (
+            <Box>
+              <Image
+                alt="user product image"
+                w={100}
+                h={100}
+                resizeMode="cover"
+                source={{
+                  uri: img.uri,
+                }}
+                borderRadius={6}
+                mr={4}
+              />
+              <Box
+                alignItems="center"
+                justifyItems="center"
+                position="absolute"
+                top={2}
+                right={6}
+                backgroundColor="white"
+                borderRadius="full"
+              >
+                <TouchableOpacity onPress={() => handleRemoveImage(img.uri)}>
+                  <XCircle
+                    weight="fill"
+                    size={20}
+                    color={theme.colors.gray[600]}
+                  />
+                </TouchableOpacity>
+              </Box>
+            </Box>
+          ))}
+          <TouchableOpacity onPress={handleImageSelect}>
+            <Box
+              w={100}
+              h={100}
+              borderRadius={6}
+              backgroundColor="gray.300"
+              justifyContent="center"
+              alignItems="center"
+            >
+              <Plus size={22} weight="bold" color={theme.colors.gray[400]} />
+            </Box>
+          </TouchableOpacity>
+        </HStack>
 
-        <VStack flex={1}>
+        <VStack flex={1} mt="3">
           <Text fontFamily={"heading"} fontSize="md" color={"gray.700"}>
             Sobre o produto
           </Text>
