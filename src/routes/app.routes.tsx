@@ -12,7 +12,6 @@ type AppRoutes = {
   home: undefined;
   userAds: undefined;
   signOut: undefined;
-  adDetails: undefined;
 };
 
 export type AppNavigationRoutesProps = BottomTabNavigationProp<AppRoutes>;

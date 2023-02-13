@@ -235,7 +235,7 @@ export function CreateAd() {
           title="Cancelar"
           width={160}
           variant="light"
-          onPress={() => console.log({ payMethods, acceptTrade })}
+          onPress={() => navigation.goBack()}
         />
         <GenericButton title="Avançar" width={160} variant="dark" />
       </HStack>

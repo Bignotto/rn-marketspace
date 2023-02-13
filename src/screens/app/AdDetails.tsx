@@ -1,8 +1,8 @@
 import { AdImagesList } from "@components/AdImagesList";
 import { GenericButton } from "@components/GenericButton";
 import { UserAvatar } from "@components/UserAvatar";
-import { useNavigation } from "@react-navigation/native";
-import { AdsRoutesNavigationProps } from "@routes/ads.routes";
+import { NativeStackScreenProps } from "@react-navigation/native-stack";
+import { AdsRoutesScreenProps } from "@routes/ads.routes";
 import { Box, HStack, ScrollView, Text, VStack } from "native-base";
 import {
   ArrowLeft,
@@ -14,6 +14,9 @@ import {
 } from "phosphor-react-native";
 import { TouchableOpacity } from "react-native";
 import { getStatusBarHeight } from "react-native-iphone-x-helper";
+
+type Props = NativeStackScreenProps<AdsRoutesScreenProps>;
+type ProfileScreenRouteProp = Props["route"];
 
 const SAMPLE_IMAGES = [
   {
@@ -34,8 +37,13 @@ const SAMPLE_IMAGES = [
   },
 ];
 
-export function AdDetails() {
-  const navigation = useNavigation<AdsRoutesNavigationProps>();
+export function AdDetails({ navigation, route }: Props) {
+  //const navigation = useNavigation<AdsRoutesNavigationProps>();
+  //const route = useRoute();
+
+  const { mode } = route.params;
+  console.log({ mode });
+
   return (
     <>
       <VStack mb="3">

@@ -214,12 +214,16 @@ export function Home() {
         flex={1}
         data={DATA}
         renderItem={({ item }) => (
-          <AdCard
-            image_uri={item.product_images[0].path}
-            name={item.name}
-            price={`R$ ${item.price}`}
-            showAvatar
-          />
+          <TouchableOpacity
+            onPress={() => navigation.navigate("adDetails", { mode: "detail" })}
+          >
+            <AdCard
+              image_uri={item.product_images[0].path}
+              name={item.name}
+              price={`R$ ${item.price}`}
+              showAvatar
+            />
+          </TouchableOpacity>
         )}
         keyExtractor={(item) => item.id}
       />
