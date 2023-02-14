@@ -2,7 +2,7 @@ import { AdImagesList } from "@components/AdImagesList";
 import { GenericButton } from "@components/GenericButton";
 import { UserAvatar } from "@components/UserAvatar";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
-import { AdsRoutesScreenProps } from "@routes/ads.routes";
+import { AdsRoutes } from "@routes/ads.routes";
 import { Box, HStack, ScrollView, Text, VStack } from "native-base";
 import {
   ArrowLeft,
@@ -15,8 +15,7 @@ import {
 import { TouchableOpacity } from "react-native";
 import { getStatusBarHeight } from "react-native-iphone-x-helper";
 
-type Props = NativeStackScreenProps<AdsRoutesScreenProps>;
-type ProfileScreenRouteProp = Props["route"];
+type ScreenProps = NativeStackScreenProps<AdsRoutes, "adDetails">;
 
 const SAMPLE_IMAGES = [
   {
@@ -37,12 +36,8 @@ const SAMPLE_IMAGES = [
   },
 ];
 
-export function AdDetails({ navigation, route }: Props) {
-  //const navigation = useNavigation<AdsRoutesNavigationProps>();
-  //const route = useRoute();
-
-  const { mode } = route.params;
-  console.log({ mode });
+export function AdDetails({ navigation, route }: ScreenProps) {
+  const { mode, adData } = route.params;
 
   return (
     <>
@@ -54,7 +49,7 @@ export function AdDetails({ navigation, route }: Props) {
         </Box>
       </VStack>
 
-      <AdImagesList images={SAMPLE_IMAGES} />
+      <AdImagesList images={adData?.product_images!} />
 
       <ScrollView
         contentContainerStyle={{ flexGrow: 1 }}
@@ -67,7 +62,7 @@ export function AdDetails({ navigation, route }: Props) {
             size={12}
           />
           <Text ml="2" fontSize="md" fontFamily="body">
-            Thiago Bignotto
+            {adData?.user.name}
           </Text>
         </HStack>
         <Box
@@ -78,29 +73,26 @@ export function AdDetails({ navigation, route }: Props) {
           alignItems="center"
         >
           <Text fontFamily="body" color="gray.600" fontSize="xs">
-            NOVO
+            {adData?.is_new ? `NOVO` : `USADO`}
           </Text>
         </Box>
         <HStack mt="2" justifyContent="space-between">
           <Text fontFamily="heading" fontSize="xl">
-            Bicicleta
+            {adData?.name}
           </Text>
           <Text fontFamily="heading" fontSize="xl" color="blue.400">
-            R$ 120,00
+            {`R$ ${adData?.price}`}
           </Text>
         </HStack>
         <Text fontFamily="body" fontSize="sm" color="gray.600">
-          Cras congue cursus in tortor sagittis placerat nunc, tellus arcu.
-          Vitae ante leo eget maecenas urna mattis cursus. Mauris metus amet
-          nibh mauris mauris accumsan, euismod. Aenean leo nunc, purus iaculis
-          in aliquam.
+          {adData?.description}
         </Text>
         <HStack mt="6" alignItems="center">
           <Text fontFamily="heading" color="gray.600" fontSize="md">
             Aceita troca?
           </Text>
           <Text fontFamily="body" color="gray.600" fontSize="md" ml="2">
-            Sim
+            {adData?.accept_trade ? `Sim` : `Não`}
           </Text>
         </HStack>
         <Text fontFamily="heading" color="gray.600" fontSize="md" mt="6">
@@ -137,7 +129,7 @@ export function AdDetails({ navigation, route }: Props) {
         px={10}
       >
         <Text fontFamily="heading" fontSize="xl" color="blue.400">
-          R$ 120,00
+          {`R$ ${adData?.price}`}
         </Text>
         <GenericButton title="Entrar em Contato" width={169} />
       </HStack>

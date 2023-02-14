@@ -215,7 +215,12 @@ export function Home() {
         data={DATA}
         renderItem={({ item }) => (
           <TouchableOpacity
-            onPress={() => navigation.navigate("adDetails", { mode: "detail" })}
+            onPress={() =>
+              navigation.navigate("adDetails", {
+                mode: "detail",
+                adData: item,
+              })
+            }
           >
             <AdCard
               image_uri={item.product_images[0].path}
