@@ -12,12 +12,10 @@ export interface IProductDTO {
   is_active: boolean;
   created_at: string;
   updated_at: string;
-  product_images: [
-    {
-      path: string;
-      id: string;
-    }
-  ];
+  product_images: {
+    path: string;
+    id: string;
+  }[];
   payment_methods: [
     {
       key: string;

@@ -21,8 +21,20 @@ export const DATA: IProductDTO[] = [
     updated_at: "2023-01-21T22:03:52.752Z",
     product_images: [
       {
-        path: "https://tm.ibxk.com.br/2016/02/23/23175905693270.jpg",
-        id: "5aadef9f-465a-49c8-9a71-dca2aa339271",
+        id: "1",
+        path: "https://avatars.githubusercontent.com/u/2911353?v=4",
+      },
+      {
+        id: "2",
+        path: "https://avatars.githubusercontent.com/u/4248081?v=4",
+      },
+      {
+        id: "3",
+        path: "https://avatars.githubusercontent.com/u/90806505?v=4",
+      },
+      {
+        id: "4",
+        path: "https://avatars.githubusercontent.com/u/10366880?v=4",
       },
     ],
     payment_methods: [

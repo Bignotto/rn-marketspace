@@ -1,6 +1,7 @@
 import { AdImagesList } from "@components/AdImagesList";
 import { GenericButton } from "@components/GenericButton";
 import { UserAvatar } from "@components/UserAvatar";
+import { IProductDTO } from "@dtos/IProductDTO";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { AdsRoutes } from "@routes/ads.routes";
 import { Box, HStack, ScrollView, Text, VStack } from "native-base";
@@ -12,8 +13,11 @@ import {
   Money,
   QrCode,
 } from "phosphor-react-native";
+import { useEffect, useState } from "react";
 import { TouchableOpacity } from "react-native";
 import { getStatusBarHeight } from "react-native-iphone-x-helper";
+
+import { DATA } from "../../_sample_data";
 
 type ScreenProps = NativeStackScreenProps<AdsRoutes, "adDetails">;
 
@@ -37,7 +41,16 @@ const SAMPLE_IMAGES = [
 ];
 
 export function AdDetails({ navigation, route }: ScreenProps) {
-  const { mode, adData } = route.params;
+  const { mode, adId } = route.params;
+  const [adData, setAdData] = useState<IProductDTO | undefined>(undefined);
+
+  useEffect(() => {
+    const ad = DATA.filter((a) => a.id === adId);
+    console.log({ ad });
+    setAdData(ad[0]);
+  }, []);
+
+  if (!adData) return;
 
   return (
     <>
