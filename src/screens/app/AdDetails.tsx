@@ -4,13 +4,22 @@ import { UserAvatar } from "@components/UserAvatar";
 import { IProductDTO } from "@dtos/IProductDTO";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { AdsRoutes } from "@routes/ads.routes";
-import { Box, HStack, ScrollView, Text, VStack } from "native-base";
+import {
+  Box,
+  Center,
+  HStack,
+  ScrollView,
+  Spinner,
+  Text,
+  VStack,
+} from "native-base";
 import {
   ArrowLeft,
   Bank,
   Barcode,
   CreditCard,
   Money,
+  PencilSimpleLine,
   QrCode,
 } from "phosphor-react-native";
 import { useEffect, useState } from "react";
@@ -21,46 +30,36 @@ import { DATA } from "../../_sample_data";
 
 type ScreenProps = NativeStackScreenProps<AdsRoutes, "adDetails">;
 
-const SAMPLE_IMAGES = [
-  {
-    id: "1",
-    path: "https://avatars.githubusercontent.com/u/2911353?v=4",
-  },
-  {
-    id: "2",
-    path: "https://avatars.githubusercontent.com/u/4248081?v=4",
-  },
-  {
-    id: "3",
-    path: "https://avatars.githubusercontent.com/u/90806505?v=4",
-  },
-  {
-    id: "4",
-    path: "https://avatars.githubusercontent.com/u/10366880?v=4",
-  },
-];
-
 export function AdDetails({ navigation, route }: ScreenProps) {
   const { mode, adId } = route.params;
   const [adData, setAdData] = useState<IProductDTO | undefined>(undefined);
 
   useEffect(() => {
     const ad = DATA.filter((a) => a.id === adId);
-    console.log({ ad });
     setAdData(ad[0]);
   }, []);
 
-  if (!adData) return;
+  if (!adData)
+    return (
+      <Center flex={1}>
+        <Spinner />
+      </Center>
+    );
 
   return (
     <>
-      <VStack mb="3">
-        <Box mt={getStatusBarHeight() + 36} px={10}>
+      <HStack mb="3" px={10} justifyContent="space-between">
+        <Box mt={getStatusBarHeight() + 36}>
           <TouchableOpacity onPress={() => navigation.goBack()}>
             <ArrowLeft />
           </TouchableOpacity>
         </Box>
-      </VStack>
+        <Box mt={getStatusBarHeight() + 36}>
+          <TouchableOpacity onPress={() => navigation.goBack()}>
+            <PencilSimpleLine />
+          </TouchableOpacity>
+        </Box>
+      </HStack>
 
       <AdImagesList images={adData?.product_images!} />
 

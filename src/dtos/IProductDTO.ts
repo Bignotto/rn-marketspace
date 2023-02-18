@@ -16,10 +16,8 @@ export interface IProductDTO {
     path: string;
     id: string;
   }[];
-  payment_methods: [
-    {
-      key: string;
-      name: string;
-    }
-  ];
+  payment_methods: {
+    key: string;
+    name: string;
+  }[];
 }
