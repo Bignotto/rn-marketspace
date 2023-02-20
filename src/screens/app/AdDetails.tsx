@@ -1,27 +1,12 @@
 import { AdImagesList } from "@components/AdImagesList";
 import { GenericButton } from "@components/GenericButton";
+import { PaymentMethodsList } from "@components/PaymentMethodsList";
 import { UserAvatar } from "@components/UserAvatar";
 import { IProductDTO } from "@dtos/IProductDTO";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { AdsRoutes } from "@routes/ads.routes";
-import {
-  Box,
-  Center,
-  HStack,
-  ScrollView,
-  Spinner,
-  Text,
-  VStack,
-} from "native-base";
-import {
-  ArrowLeft,
-  Bank,
-  Barcode,
-  CreditCard,
-  Money,
-  PencilSimpleLine,
-  QrCode,
-} from "phosphor-react-native";
+import { Box, Center, HStack, ScrollView, Spinner, Text } from "native-base";
+import { ArrowLeft, PencilSimpleLine } from "phosphor-react-native";
 import { useEffect, useState } from "react";
 import { TouchableOpacity } from "react-native";
 import { getStatusBarHeight } from "react-native-iphone-x-helper";
@@ -110,28 +95,7 @@ export function AdDetails({ navigation, route }: ScreenProps) {
         <Text fontFamily="heading" color="gray.600" fontSize="md" mt="6">
           Meios de pagamento:
         </Text>
-        <VStack mt="2">
-          <HStack alignItems="center" mb="2">
-            <Barcode />
-            <Text ml="1">Boleto</Text>
-          </HStack>
-          <HStack alignItems="center" mb="2">
-            <QrCode />
-            <Text ml="1">Pix</Text>
-          </HStack>
-          <HStack alignItems="center" mb="2">
-            <Money />
-            <Text ml="1">Dinheiro</Text>
-          </HStack>
-          <HStack alignItems="center" mb="2">
-            <CreditCard />
-            <Text ml="1">Cartão de Crédito</Text>
-          </HStack>
-          <HStack alignItems="center" mb="2">
-            <Bank />
-            <Text ml="1">Depósito Bancário</Text>
-          </HStack>
-        </VStack>
+        <PaymentMethodsList methods={adData.payment_methods} />
       </ScrollView>
       <HStack
         h="90"

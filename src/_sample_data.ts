@@ -42,14 +42,19 @@ export const DATA: IProductDTO[] = [
         key: "pix",
         name: "Pix",
       },
+      {
+        key: "cash",
+        name: "Dinheiro",
+      },
     ],
   },
   {
     id: "7a58dfe1-0ac9-4cee-accb-29dba5a51881",
-    name: "Game Boy",
-    description: "Game boy original, funcionando!",
+    name: "Nintendo 64",
+    description:
+      "Nintendo 64 com Super Mario 64. Acompanha cabo RCA, fonte de alimentação e um joystick cinza. Foto meramente ilustrativa.",
     is_new: false,
-    price: 300,
+    price: 1230,
     accept_trade: false,
     user_id: "458e155b-7994-4e39-bd2b-b6353311f32c",
     user: {
@@ -72,6 +77,14 @@ export const DATA: IProductDTO[] = [
       {
         key: "pix",
         name: "Pix",
+      },
+      {
+        key: "boleto",
+        name: "Boleto",
+      },
+      {
+        key: "card",
+        name: "Cartão de Crédito",
       },
     ],
   },
