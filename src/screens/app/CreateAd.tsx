@@ -29,6 +29,7 @@ export function CreateAd() {
   const [adImages, setAdImages] = useState<ImagePicker.ImagePickerAsset[]>([]);
   const [acceptTrade, setAcceptTrade] = useState(true);
   const [payMethods, setPayMethods] = useState([]);
+  const [condition, setCondition] = useState("NEW");
 
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
@@ -66,7 +67,7 @@ export function CreateAd() {
       name,
       description,
       is_active: false,
-      is_new: false,
+      is_new: condition === "NEW",
       price: parseInt(price),
       user: {
         id: "458e155b-7994-4e39-bd2b-b6353311f32c",
@@ -204,6 +205,10 @@ export function CreateAd() {
           name="condition"
           accessibilityLabel="used or new"
           defaultValue="NEW"
+          value={condition}
+          onChange={(value) => {
+            setCondition(value);
+          }}
         >
           <HStack mt="4">
             <Radio
