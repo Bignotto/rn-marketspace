@@ -1,3 +1,4 @@
+import { IProductDTO } from "@dtos/IProductDTO";
 import {
   createNativeStackNavigator,
   NativeStackNavigationProp,
@@ -6,13 +7,23 @@ import { AdDetails } from "@screens/app/AdDetails";
 import { CreateAd } from "@screens/app/CreateAd";
 import { AppRoutes } from "./app.routes";
 
-type AdsRoutes = {
+export type AdsRoutes = {
   appRoutes: undefined;
-  adDetails: undefined;
   createAd: undefined;
+  adDetails: {
+    mode:
+      | "detail" //when user tap to see the ad
+      | "preview" //when user just created the ad
+      | "owner"; //when user is seeing his own ad
+    adId?: string | undefined;
+    previewData?: IProductDTO | undefined;
+  };
 };
 
-export type AdsRoutesNavigationProps = NativeStackNavigationProp<AdsRoutes>;
+export type AdsRoutesNavigationProps = NativeStackNavigationProp<
+  AdsRoutes,
+  "adDetails"
+>;
 
 const { Navigator, Screen } = createNativeStackNavigator<AdsRoutes>();
 

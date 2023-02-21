@@ -1,5 +1,6 @@
 import { GenericButton } from "@components/GenericButton";
 import { TextInput } from "@components/TextInput";
+import { IProductDTO } from "@dtos/IProductDTO";
 import { useNavigation } from "@react-navigation/native";
 import { AdsRoutesNavigationProps } from "@routes/ads.routes";
 import * as ImagePicker from "expo-image-picker";
@@ -28,6 +29,11 @@ export function CreateAd() {
   const [adImages, setAdImages] = useState<ImagePicker.ImagePickerAsset[]>([]);
   const [acceptTrade, setAcceptTrade] = useState(true);
   const [payMethods, setPayMethods] = useState([]);
+  const [condition, setCondition] = useState("NEW");
+
+  const [name, setName] = useState("");
+  const [description, setDescription] = useState("");
+  const [price, setPrice] = useState("");
 
   async function handleImageSelect() {
     const selectedImages = await ImagePicker.launchImageLibraryAsync({
@@ -53,6 +59,37 @@ export function CreateAd() {
 
   function toggleSwitchState() {
     setAcceptTrade((a) => !a);
+  }
+
+  function handlePreviewAd() {
+    const previewData: IProductDTO = {
+      id: "preview",
+      name,
+      description,
+      is_active: false,
+      is_new: condition === "NEW",
+      price: parseInt(price),
+      user: {
+        id: "458e155b-7994-4e39-bd2b-b6353311f32c",
+        avatar: "4b04f3a8d21936b6d592-sample_avatar.png",
+        name: "Rocketseat",
+        email: "desafio@rocketseat.com.br",
+        tel: "+5511915839648",
+      },
+      created_at: Date.now().toLocaleString(),
+      updated_at: Date.now().toLocaleString(),
+      product_images: adImages.map((img) => {
+        return {
+          path: img.uri!,
+          id: img.assetId!,
+        };
+      }),
+      payment_methods: payMethods,
+      accept_trade: acceptTrade,
+      user_id: "458e155b-7994-4e39-bd2b-b6353311f32c",
+    };
+
+    console.log({ previewData });
   }
 
   return (
@@ -131,7 +168,13 @@ export function CreateAd() {
           <Text fontFamily={"heading"} fontSize="md" color={"gray.700"}>
             Sobre o produto
           </Text>
-          <TextInput placeholder="Título do anúncio" mb="2" mt="4" />
+          <TextInput
+            placeholder="Título do anúncio"
+            mb="2"
+            mt="4"
+            value={name}
+            onChangeText={setName}
+          />
           <TextArea
             placeholder="Descrição do produto"
             h={160}
@@ -154,12 +197,18 @@ export function CreateAd() {
               borderRadius: "md",
             }}
             autoCompleteType={undefined}
+            value={description}
+            onChangeText={setDescription}
           />
         </VStack>
         <Radio.Group
           name="condition"
           accessibilityLabel="used or new"
           defaultValue="NEW"
+          value={condition}
+          onChange={(value) => {
+            setCondition(value);
+          }}
         >
           <HStack mt="4">
             <Radio
@@ -188,7 +237,13 @@ export function CreateAd() {
         <Text fontFamily={"heading"} fontSize="md" color={"gray.700"} mt="4">
           Venda
         </Text>
-        <TextInput placeholder="R$ Valor do produto" mb="2" mt="4" />
+        <TextInput
+          placeholder="R$ Valor do produto"
+          mb="2"
+          mt="4"
+          value={price}
+          onChangeText={setPrice}
+        />
         <Text fontFamily={"heading"} fontSize="md" color={"gray.700"} mt="4">
           Aceita troca?
         </Text>
@@ -235,9 +290,14 @@ export function CreateAd() {
           title="Cancelar"
           width={160}
           variant="light"
-          onPress={() => console.log({ payMethods, acceptTrade })}
+          onPress={() => navigation.goBack()}
         />
-        <GenericButton title="Avançar" width={160} variant="dark" />
+        <GenericButton
+          title="Avançar"
+          width={160}
+          variant="dark"
+          onPress={handlePreviewAd}
+        />
       </HStack>
     </>
   );
