@@ -40,9 +40,11 @@ export function AdDetails({ navigation, route }: ScreenProps) {
           </TouchableOpacity>
         </Box>
         <Box mt={getStatusBarHeight() + 36}>
-          <TouchableOpacity onPress={() => navigation.goBack()}>
-            <PencilSimpleLine />
-          </TouchableOpacity>
+          {mode === "owner" && (
+            <TouchableOpacity onPress={() => navigation.goBack()}>
+              <PencilSimpleLine />
+            </TouchableOpacity>
+          )}
         </Box>
       </HStack>
 
@@ -59,7 +61,7 @@ export function AdDetails({ navigation, route }: ScreenProps) {
             size={12}
           />
           <Text ml="2" fontSize="md" fontFamily="body">
-            {adData?.user.name}
+            {adData?.user!.name}
           </Text>
         </HStack>
         <Box

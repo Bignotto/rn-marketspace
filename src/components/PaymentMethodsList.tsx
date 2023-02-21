@@ -23,7 +23,7 @@ export function PaymentMethodsList({ methods }: PaymentMethodsListProps) {
             return (
               <HStack alignItems="center" mb="2" key={p.key}>
                 <QrCode />
-                <Text ml="1">{p.name}</Text>
+                <Text ml="1">Pix</Text>
               </HStack>
             );
           case "boleto":

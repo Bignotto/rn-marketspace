@@ -1,3 +1,4 @@
+import { IProductDTO } from "@dtos/IProductDTO";
 import {
   createNativeStackNavigator,
   NativeStackNavigationProp,
@@ -14,7 +15,8 @@ export type AdsRoutes = {
       | "detail" //when user tap to see the ad
       | "preview" //when user just created the ad
       | "owner"; //when user is seeing his own ad
-    adId: string | undefined;
+    adId?: string | undefined;
+    previewData?: IProductDTO | undefined;
   };
 };
 
