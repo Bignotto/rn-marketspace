@@ -16,11 +16,21 @@ import * as FileSystem from "expo-file-system";
 import * as ImagePicker from "expo-image-picker";
 import { PencilSimpleLine, User } from "phosphor-react-native";
 import { useState } from "react";
+import { Controller, useForm } from "react-hook-form";
 import { TouchableOpacity } from "react-native";
 import { getStatusBarHeight } from "react-native-iphone-x-helper";
 
+type FormDataProps = {
+  name: string;
+  email: string;
+  phone: string;
+  password: string;
+  confirmation: string;
+};
+
 export function SignUp() {
   const navigation = useNavigation();
+  const { control, handleSubmit } = useForm<FormDataProps>();
 
   const [loadingAvatar, setLoadingAvatar] = useState(false);
   const [userAvatar, setUserAvatar] = useState("");
@@ -63,6 +73,14 @@ export function SignUp() {
     }
   }
 
+  async function handleCreateUser({
+    name,
+    email,
+    phone,
+    password,
+    confirmation,
+  }: FormDataProps) {}
+
   return (
     <ScrollView
       contentContainerStyle={{ flexGrow: 1 }}
@@ -96,8 +114,6 @@ export function SignUp() {
                   h={86}
                   w={90}
                   rounded="full"
-                  // borderWidth={3}
-                  // borderColor="#647AC7"
                 />
               ) : (
                 <User size={54} color="#9F9BA1" />
@@ -121,17 +137,74 @@ export function SignUp() {
           </Box>
         </Center>
         <Center mt="4">
-          <TextInput placeholder="Nome" mb="4" />
-          <TextInput
-            placeholder="E-mail"
-            keyboardType="email-address"
-            autoCapitalize="none"
-            mb="4"
+          <Controller
+            control={control}
+            name="name"
+            render={({ field: { onChange, value } }) => (
+              <TextInput
+                placeholder="Nome"
+                mb="4"
+                onChangeText={onChange}
+                value={value}
+              />
+            )}
           />
-          <TextInput placeholder="Telefone" mb="4" />
-          <TextInput placeholder="Senha" secureTextEntry mb="4" />
-          <TextInput placeholder="Confirmar senha" secureTextEntry mb="4" />
-          <Button title="Criar" variant="dark" />
+          <Controller
+            control={control}
+            name="email"
+            render={({ field: { onChange, value } }) => (
+              <TextInput
+                placeholder="E-mail"
+                keyboardType="email-address"
+                autoCapitalize="none"
+                mb="4"
+                onChangeText={onChange}
+                value={value}
+              />
+            )}
+          />
+
+          <Controller
+            control={control}
+            name="phone"
+            render={({ field: { onChange, value } }) => (
+              <TextInput
+                placeholder="Telefone"
+                mb="4"
+                onChangeText={onChange}
+                value={value}
+              />
+            )}
+          />
+          <Controller
+            control={control}
+            name="password"
+            render={({ field: { onChange, value } }) => (
+              <TextInput
+                placeholder="Senha"
+                mb="4"
+                onChangeText={onChange}
+                value={value}
+              />
+            )}
+          />
+          <Controller
+            control={control}
+            name="confirmation"
+            render={({ field: { onChange, value } }) => (
+              <TextInput
+                placeholder="Confirmar senha"
+                mb="4"
+                onChangeText={onChange}
+                value={value}
+              />
+            )}
+          />
+          <Button
+            title="Criar"
+            variant="dark"
+            onPress={handleSubmit(handleCreateUser)}
+          />
         </Center>
         <Center pt="16" mb="20">
           <Heading fontSize="xl" mb="4">
