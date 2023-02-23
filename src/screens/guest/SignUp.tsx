@@ -11,6 +11,7 @@ import {
 
 import LogoPng from "@assets/LogoSm.png";
 import { GenericButton as Button } from "@components/GenericButton";
+import { yupResolver } from "@hookform/resolvers/yup";
 import { useNavigation } from "@react-navigation/native";
 import * as FileSystem from "expo-file-system";
 import * as ImagePicker from "expo-image-picker";
@@ -19,6 +20,7 @@ import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { TouchableOpacity } from "react-native";
 import { getStatusBarHeight } from "react-native-iphone-x-helper";
+import * as yup from "yup";
 
 type FormDataProps = {
   name: string;
@@ -28,9 +30,23 @@ type FormDataProps = {
   confirmation: string;
 };
 
+const formValidation = yup.object({
+  name: yup.string().required("É necessário um nome"),
+  email: yup
+    .string()
+    .required("É necessário um e-mail")
+    .email("É necessário um e-mail válido"),
+});
+
 export function SignUp() {
   const navigation = useNavigation();
-  const { control, handleSubmit } = useForm<FormDataProps>();
+  const {
+    control,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<FormDataProps>({
+    resolver: yupResolver(formValidation),
+  });
 
   const [loadingAvatar, setLoadingAvatar] = useState(false);
   const [userAvatar, setUserAvatar] = useState("");
@@ -81,6 +97,7 @@ export function SignUp() {
     confirmation,
   }: FormDataProps) {}
 
+  console.log({ errors });
   return (
     <ScrollView
       contentContainerStyle={{ flexGrow: 1 }}
@@ -160,6 +177,7 @@ export function SignUp() {
                 mb="4"
                 onChangeText={onChange}
                 value={value}
+                error={errors.email?.message}
               />
             )}
           />

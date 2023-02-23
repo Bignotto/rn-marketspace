@@ -5,6 +5,8 @@ type Props = IInputProps & {
 };
 
 export function TextInput({ error, isInvalid, ...rest }: Props) {
+  const invalid = !!error || isInvalid;
+
   return (
     <FormControl isInvalid={isInvalid}>
       <Input
@@ -16,6 +18,7 @@ export function TextInput({ error, isInvalid, ...rest }: Props) {
         color="gray.700"
         fontFamily="body"
         placeholderTextColor="gray.400"
+        isInvalid={invalid}
         _invalid={{
           borderWidth: 1,
           borderColor: "red.500",
