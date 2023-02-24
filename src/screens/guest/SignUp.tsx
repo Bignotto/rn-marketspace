@@ -36,6 +36,15 @@ const formValidation = yup.object({
     .string()
     .required("É necessário um e-mail")
     .email("É necessário um e-mail válido"),
+  phone: yup.string().required("É necessário um telefone"),
+  password: yup
+    .string()
+    .required("É necessário uma senha")
+    .min(6, "Pelo menos 6 caracteres"),
+  confirmation: yup
+    .string()
+    .required("Confirme sua senha")
+    .oneOf([yup.ref("password"), ""], "Senhas não conferem"),
 });
 
 export function SignUp() {
@@ -95,7 +104,9 @@ export function SignUp() {
     phone,
     password,
     confirmation,
-  }: FormDataProps) {}
+  }: FormDataProps) {
+    console.log("CRIOU PORRA!");
+  }
 
   console.log({ errors });
   return (
@@ -163,6 +174,7 @@ export function SignUp() {
                 mb="4"
                 onChangeText={onChange}
                 value={value}
+                error={errors.name?.message}
               />
             )}
           />
@@ -191,6 +203,7 @@ export function SignUp() {
                 mb="4"
                 onChangeText={onChange}
                 value={value}
+                error={errors.phone?.message}
               />
             )}
           />
@@ -203,6 +216,7 @@ export function SignUp() {
                 mb="4"
                 onChangeText={onChange}
                 value={value}
+                error={errors.password?.message}
               />
             )}
           />
@@ -215,6 +229,7 @@ export function SignUp() {
                 mb="4"
                 onChangeText={onChange}
                 value={value}
+                error={errors.confirmation?.message}
               />
             )}
           />

@@ -8,10 +8,9 @@ export function TextInput({ error, isInvalid, ...rest }: Props) {
   const invalid = !!error || isInvalid;
 
   return (
-    <FormControl isInvalid={isInvalid}>
+    <FormControl isInvalid={invalid}>
       <Input
         bg="gray.100"
-        h="11"
         px={4}
         borderWidth={0}
         fontSize="lg"
@@ -31,7 +30,7 @@ export function TextInput({ error, isInvalid, ...rest }: Props) {
         }}
         {...rest}
       />
-      <FormControl.ErrorMessage _text={{ color: "red.500" }}>
+      <FormControl.ErrorMessage _text={{ color: "red.500" }} mt={-3} mb={4}>
         {error}
       </FormControl.ErrorMessage>
     </FormControl>
