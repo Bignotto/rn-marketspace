@@ -19,6 +19,9 @@ LogBox.ignoreLogs([
 ]);
 
 export default function App() {
+  console.log("--");
+  console.log(process.env.APP_NAME);
+
   let [fontsLoaded] = useFonts({
     Karla_400Regular,
     Karla_700Bold,
