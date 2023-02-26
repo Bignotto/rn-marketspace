@@ -13,12 +13,14 @@ import LogoPng from "@assets/LogoSm.png";
 import { GenericButton as Button } from "@components/GenericButton";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useNavigation } from "@react-navigation/native";
+import { api } from "@services/api";
+import axios from "axios";
 import * as FileSystem from "expo-file-system";
 import * as ImagePicker from "expo-image-picker";
 import { PencilSimpleLine, User } from "phosphor-react-native";
 import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
-import { TouchableOpacity } from "react-native";
+import { Alert, TouchableOpacity } from "react-native";
 import { getStatusBarHeight } from "react-native-iphone-x-helper";
 import * as yup from "yup";
 
@@ -103,12 +105,34 @@ export function SignUp() {
     email,
     phone,
     password,
-    confirmation,
   }: FormDataProps) {
-    console.log("CRIOU PORRA!");
+    const imageFileExtension = userAvatar.split(".").pop();
+
+    const imageFile = {
+      name: `${name}.${imageFileExtension}`.toLowerCase(),
+      uri: userAvatar,
+      type: `image/${imageFileExtension}`,
+    } as any;
+
+    const signUpFormData = new FormData();
+    signUpFormData.append("avatar", imageFile);
+    signUpFormData.append("name", name);
+    signUpFormData.append("email", email);
+    signUpFormData.append("tel", phone);
+    signUpFormData.append("password", password);
+
+    try {
+      console.log(process.env.APP_API_URL);
+      const response = await api.post("/users", signUpFormData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+    } catch (error) {
+      if (axios.isAxiosError(error)) Alert.alert(error.response?.data.message);
+    }
   }
 
-  console.log({ errors });
   return (
     <ScrollView
       contentContainerStyle={{ flexGrow: 1 }}
