@@ -6,6 +6,7 @@ import {
   Image,
   ScrollView,
   Text,
+  useToast,
   VStack,
 } from "native-base";
 
@@ -14,7 +15,7 @@ import { GenericButton as Button } from "@components/GenericButton";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useNavigation } from "@react-navigation/native";
 import { api } from "@services/api";
-import axios from "axios";
+import { AppError } from "@utils/AppError";
 import * as FileSystem from "expo-file-system";
 import * as ImagePicker from "expo-image-picker";
 import { PencilSimpleLine, User } from "phosphor-react-native";
@@ -51,6 +52,7 @@ const formValidation = yup.object({
 
 export function SignUp() {
   const navigation = useNavigation();
+  const toast = useToast();
   const {
     control,
     handleSubmit,
@@ -82,14 +84,11 @@ export function SignUp() {
         );
 
         if (photoInfo.size && photoInfo.size / 1024 / 1024 > 2) {
-          console.log("image too big");
-          return;
-
-          // return toast.show({
-          //   title: 'Essa imagem é muito grande. Escolha uma de até 5MB.',
-          //   placement: 'top',
-          //   bgColor: 'red.500'
-          // })
+          return toast.show({
+            title: "Essa imagem é muito grande. Escolha uma de até 2MB.",
+            placement: "top",
+            bgColor: "red.500",
+          });
         }
 
         setUserAvatar(selectedImage.assets[0].uri);
@@ -106,6 +105,8 @@ export function SignUp() {
     phone,
     password,
   }: FormDataProps) {
+    if (!userAvatar) return Alert.alert("Você precisa escolher um avatar.");
+
     const imageFileExtension = userAvatar.split(".").pop();
 
     const imageFile = {
@@ -122,14 +123,23 @@ export function SignUp() {
     signUpFormData.append("password", password);
 
     try {
-      console.log(process.env.APP_API_URL);
       const response = await api.post("/users", signUpFormData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
       });
     } catch (error) {
-      if (axios.isAxiosError(error)) Alert.alert(error.response?.data.message);
+      const isAppError = error instanceof AppError;
+      const title = isAppError
+        ? error.message
+        : "Não foi possível criar a conta.";
+
+      return toast.show({
+        title,
+        placement: "top",
+        bgColor: "red.500",
+        duration: 6500,
+      });
     }
   }
 
