@@ -3,15 +3,35 @@ import { Center, Heading, Image, ScrollView, VStack } from "native-base";
 
 import LogoPng from "@assets/logo.png";
 import { GenericButton } from "@components/GenericButton";
+import { useAuth } from "@hooks/useAuth";
 import { useNavigation } from "@react-navigation/native";
 import { GuestRoutesNavigationProps } from "@routes/guest.routes";
+import { Controller, useForm } from "react-hook-form";
+import { Alert } from "react-native";
 import { getStatusBarHeight } from "react-native-iphone-x-helper";
 
+type FormDataProps = {
+  email: string;
+  password: string;
+};
+
 export function Login() {
+  const { signIn } = useAuth();
   const navigation = useNavigation<GuestRoutesNavigationProps>();
+
+  const { control, handleSubmit } = useForm<FormDataProps>();
 
   function handleNavigateSignUp() {
     navigation.navigate("signUp");
+  }
+
+  async function handleLogin({ email, password }: FormDataProps) {
+    try {
+      const response = await signIn(email, password);
+      return Alert.alert(response);
+    } catch (error) {
+      console.log({ error });
+    }
   }
 
   return (
@@ -34,14 +54,32 @@ export function Login() {
           <Heading fontSize="lg">Acesse sua conta</Heading>
         </Center>
         <Center mt="4">
-          <TextInput
-            placeholder="E-mail"
-            keyboardType="email-address"
-            autoCapitalize="none"
-            mb="4"
+          <Controller
+            control={control}
+            name="email"
+            render={({ field: { onChange } }) => (
+              <TextInput
+                placeholder="E-mail"
+                keyboardType="email-address"
+                autoCapitalize="none"
+                mb="4"
+                onChangeText={onChange}
+              />
+            )}
           />
-          <TextInput placeholder="Senha" secureTextEntry mb="4" />
-          <GenericButton title="Entrar" />
+          <Controller
+            control={control}
+            name="password"
+            render={({ field: { onChange } }) => (
+              <TextInput
+                placeholder="Senha"
+                secureTextEntry
+                mb="4"
+                onChangeText={onChange}
+              />
+            )}
+          />
+          <GenericButton title="Entrar" onPress={handleSubmit(handleLogin)} />
         </Center>
       </VStack>
       <Center bgColor="gray.100" px={10} pt="16" mb="20">
