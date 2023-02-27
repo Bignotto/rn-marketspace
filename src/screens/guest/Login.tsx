@@ -1,36 +1,76 @@
 import { TextInput } from "@components/TextInput";
-import { Center, Heading, Image, ScrollView, VStack } from "native-base";
+import {
+  Center,
+  Heading,
+  Image,
+  ScrollView,
+  useToast,
+  VStack,
+} from "native-base";
 
 import LogoPng from "@assets/logo.png";
 import { GenericButton } from "@components/GenericButton";
+import { yupResolver } from "@hookform/resolvers/yup";
 import { useAuth } from "@hooks/useAuth";
 import { useNavigation } from "@react-navigation/native";
 import { GuestRoutesNavigationProps } from "@routes/guest.routes";
+import { AppError } from "@utils/AppError";
+import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { Alert } from "react-native";
 import { getStatusBarHeight } from "react-native-iphone-x-helper";
+import * as yup from "yup";
 
 type FormDataProps = {
   email: string;
   password: string;
 };
 
+const formValidation = yup.object({
+  email: yup
+    .string()
+    .required("É obrigatório um e-mail.")
+    .email("E-mail inválido."),
+  password: yup.string().required("É preciso uma senha."),
+});
+
 export function Login() {
+  const [isLoading, setIsLoading] = useState(false);
   const { signIn } = useAuth();
   const navigation = useNavigation<GuestRoutesNavigationProps>();
+  const toast = useToast();
 
-  const { control, handleSubmit } = useForm<FormDataProps>();
+  const {
+    control,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<FormDataProps>({
+    resolver: yupResolver(formValidation),
+  });
 
   function handleNavigateSignUp() {
     navigation.navigate("signUp");
   }
 
   async function handleLogin({ email, password }: FormDataProps) {
+    setIsLoading(true);
     try {
       const response = await signIn(email, password);
       return Alert.alert(response);
     } catch (error) {
-      console.log({ error });
+      const isAppError = error instanceof AppError;
+      const title = isAppError
+        ? error.message
+        : "Não foi possível criar a conta.";
+
+      return toast.show({
+        title,
+        placement: "top",
+        bgColor: "red.500",
+        duration: 6500,
+      });
+    } finally {
+      setIsLoading(false);
     }
   }
 
@@ -64,6 +104,7 @@ export function Login() {
                 autoCapitalize="none"
                 mb="4"
                 onChangeText={onChange}
+                error={errors.email?.message}
               />
             )}
           />
@@ -76,10 +117,15 @@ export function Login() {
                 secureTextEntry
                 mb="4"
                 onChangeText={onChange}
+                error={errors.password?.message}
               />
             )}
           />
-          <GenericButton title="Entrar" onPress={handleSubmit(handleLogin)} />
+          <GenericButton
+            title="Entrar"
+            onPress={handleSubmit(handleLogin)}
+            isLoading={isLoading}
+          />
         </Center>
       </VStack>
       <Center bgColor="gray.100" px={10} pt="16" mb="20">
