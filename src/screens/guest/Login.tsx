@@ -36,9 +36,11 @@ const formValidation = yup.object({
 
 export function Login() {
   const [isLoading, setIsLoading] = useState(false);
-  const { signIn } = useAuth();
+  const { signIn, user } = useAuth();
   const navigation = useNavigation<GuestRoutesNavigationProps>();
   const toast = useToast();
+
+  console.log({ user, message: "logado agora" });
 
   const {
     control,
@@ -61,7 +63,7 @@ export function Login() {
       const isAppError = error instanceof AppError;
       const title = isAppError
         ? error.message
-        : "Não foi possível criar a conta.";
+        : `Não foi possível entrar.\nTente novamente mais tarde.`;
 
       return toast.show({
         title,
