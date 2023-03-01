@@ -1,7 +1,10 @@
+import { IProductDTO } from "@dtos/IProductDTO";
 import {
   BottomTabNavigationProp,
   createBottomTabNavigator,
 } from "@react-navigation/bottom-tabs";
+import { AdDetails } from "@screens/app/AdDetails";
+import { CreateAd } from "@screens/app/CreateAd";
 import { Home } from "@screens/app/Home";
 import { SignOut as SignOutScreen } from "@screens/app/SignOut";
 import { UserAds } from "@screens/app/UserAds";
@@ -12,6 +15,15 @@ type AppRoutes = {
   home: undefined;
   userAds: undefined;
   signOut: undefined;
+  createAd: undefined;
+  adDetails: {
+    mode:
+      | "detail" //when user tap to see the ad
+      | "preview" //when user just created the ad
+      | "owner"; //when user is seeing his own ad
+    adId?: string | undefined;
+    previewData?: IProductDTO | undefined;
+  };
 };
 
 export type AppNavigationRoutesProps = BottomTabNavigationProp<AppRoutes>;
@@ -66,6 +78,22 @@ export function AppRoutes() {
               weight={color === theme.colors.blue[800] ? "bold" : "regular"}
             />
           ),
+        }}
+      />
+      <Screen
+        name="createAd"
+        component={CreateAd}
+        options={{
+          tabBarStyle: { display: "none" },
+          tabBarButton: () => null,
+        }}
+      />
+      <Screen
+        name="adDetails"
+        component={AdDetails}
+        options={{
+          tabBarStyle: { display: "none" },
+          tabBarButton: () => null,
         }}
       />
     </Navigator>
