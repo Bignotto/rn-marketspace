@@ -17,7 +17,6 @@ import { GuestRoutesNavigationProps } from "@routes/guest.routes";
 import { AppError } from "@utils/AppError";
 import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
-import { Alert } from "react-native";
 import { getStatusBarHeight } from "react-native-iphone-x-helper";
 import * as yup from "yup";
 
@@ -57,8 +56,7 @@ export function Login() {
   async function handleLogin({ email, password }: FormDataProps) {
     setIsLoading(true);
     try {
-      const response = await signIn(email, password);
-      return Alert.alert(response);
+      await signIn(email, password);
     } catch (error) {
       const isAppError = error instanceof AppError;
       const title = isAppError
