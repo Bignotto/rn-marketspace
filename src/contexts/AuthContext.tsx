@@ -26,13 +26,7 @@ type AuthContextProviderProps = {
 export const AuthContext = createContext<AuthContextDataProps>(
   {} as AuthContextDataProps
 );
-/*
-obter o token OK
-salvar o token OK
-  - storage OK
-implementar useEffect pra carregar o token
-validar o token
-*/
+
 export function AuthContextProvider({ children }: AuthContextProviderProps) {
   const [user, setUser] = useState<IUserDTO>({} as IUserDTO);
   const [isLoading, setIsLoading] = useState(false);
@@ -55,7 +49,6 @@ export function AuthContextProvider({ children }: AuthContextProviderProps) {
       const loggedUser = await storageUserGet();
       const { token } = await storageAuthTokenGet();
 
-      //TODO: validate token!!
       if (token && loggedUser) updateSession(loggedUser, token);
     } catch (error) {
       throw error;

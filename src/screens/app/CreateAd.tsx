@@ -1,8 +1,7 @@
 import { GenericButton } from "@components/GenericButton";
 import { TextInput } from "@components/TextInput";
-import { IProductDTO } from "@dtos/IProductDTO";
 import { useNavigation } from "@react-navigation/native";
-import { AdsRoutesNavigationProps } from "@routes/ads.routes";
+import { AppNavigationRoutesProps } from "@routes/app.routes";
 import * as ImagePicker from "expo-image-picker";
 import {
   Box,
@@ -19,21 +18,29 @@ import {
 } from "native-base";
 import { ArrowLeft, Plus, XCircle } from "phosphor-react-native";
 import { useState } from "react";
+import { Controller, useForm } from "react-hook-form";
 import { TouchableOpacity } from "react-native";
 import { getStatusBarHeight } from "react-native-iphone-x-helper";
 
-export function CreateAd() {
-  const navigation = useNavigation<AdsRoutesNavigationProps>();
-  const theme = useTheme();
+type FormDataProps = {
+  name: string;
+  description: string;
+  price: string;
+};
 
+export function CreateAd() {
   const [adImages, setAdImages] = useState<ImagePicker.ImagePickerAsset[]>([]);
   const [acceptTrade, setAcceptTrade] = useState(true);
   const [payMethods, setPayMethods] = useState([]);
   const [condition, setCondition] = useState("NEW");
 
-  const [name, setName] = useState("");
-  const [description, setDescription] = useState("");
-  const [price, setPrice] = useState("");
+  const navigation = useNavigation<AppNavigationRoutesProps>();
+  const theme = useTheme();
+  const {
+    control,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<FormDataProps>();
 
   async function handleImageSelect() {
     const selectedImages = await ImagePicker.launchImageLibraryAsync({
@@ -61,35 +68,8 @@ export function CreateAd() {
     setAcceptTrade((a) => !a);
   }
 
-  function handlePreviewAd() {
-    const previewData: IProductDTO = {
-      id: "preview",
-      name,
-      description,
-      is_active: false,
-      is_new: condition === "NEW",
-      price: parseInt(price),
-      user: {
-        id: "458e155b-7994-4e39-bd2b-b6353311f32c",
-        avatar: "4b04f3a8d21936b6d592-sample_avatar.png",
-        name: "Rocketseat",
-        email: "desafio@rocketseat.com.br",
-        tel: "+5511915839648",
-      },
-      created_at: Date.now().toLocaleString(),
-      updated_at: Date.now().toLocaleString(),
-      product_images: adImages.map((img) => {
-        return {
-          path: img.uri!,
-          id: img.assetId!,
-        };
-      }),
-      payment_methods: payMethods,
-      accept_trade: acceptTrade,
-      user_id: "458e155b-7994-4e39-bd2b-b6353311f32c",
-    };
-
-    console.log({ previewData });
+  function handlePreviewAd({ name, description, price }: FormDataProps) {
+    console.log({ name, description, price });
   }
 
   return (
@@ -168,37 +148,50 @@ export function CreateAd() {
           <Text fontFamily={"heading"} fontSize="md" color={"gray.700"}>
             Sobre o produto
           </Text>
-          <TextInput
-            placeholder="Título do anúncio"
-            mb="2"
-            mt="4"
-            value={name}
-            onChangeText={setName}
+          <Controller
+            control={control}
+            name="name"
+            render={({ field: { onChange, value } }) => (
+              <TextInput
+                placeholder="Título do anúncio"
+                mb="2"
+                mt="4"
+                value={value}
+                onChangeText={onChange}
+              />
+            )}
           />
-          <TextArea
-            placeholder="Descrição do produto"
-            h={160}
-            mt="4"
-            bg="gray.100"
-            px={4}
-            borderWidth={0}
-            fontSize="lg"
-            color="gray.700"
-            fontFamily="body"
-            placeholderTextColor="gray.400"
-            _invalid={{
-              borderWidth: 1,
-              borderColor: "red.500",
-            }}
-            _focus={{
-              bgColor: "gray.100",
-              borderWidth: 1,
-              borderColor: "gray.400",
-              borderRadius: "md",
-            }}
-            autoCompleteType={undefined}
-            value={description}
-            onChangeText={setDescription}
+
+          <Controller
+            control={control}
+            name="description"
+            render={({ field: { onChange, value } }) => (
+              <TextArea
+                placeholder="Descrição do produto"
+                h={160}
+                mt="4"
+                bg="gray.100"
+                px={4}
+                borderWidth={0}
+                fontSize="lg"
+                color="gray.700"
+                fontFamily="body"
+                placeholderTextColor="gray.400"
+                _invalid={{
+                  borderWidth: 1,
+                  borderColor: "red.500",
+                }}
+                _focus={{
+                  bgColor: "gray.100",
+                  borderWidth: 1,
+                  borderColor: "gray.400",
+                  borderRadius: "md",
+                }}
+                autoCompleteType={undefined}
+                value={value}
+                onChangeText={onChange}
+              />
+            )}
           />
         </VStack>
         <Radio.Group
@@ -237,12 +230,19 @@ export function CreateAd() {
         <Text fontFamily={"heading"} fontSize="md" color={"gray.700"} mt="4">
           Venda
         </Text>
-        <TextInput
-          placeholder="R$ Valor do produto"
-          mb="2"
-          mt="4"
-          value={price}
-          onChangeText={setPrice}
+        <Controller
+          control={control}
+          name="price"
+          render={({ field: { onChange, value } }) => (
+            <TextInput
+              placeholder="R$ Valor do produto"
+              mb="2"
+              mt="4"
+              value={value}
+              onChangeText={onChange}
+              keyboardType="number-pad"
+            />
+          )}
         />
         <Text fontFamily={"heading"} fontSize="md" color={"gray.700"} mt="4">
           Aceita troca?
@@ -296,7 +296,7 @@ export function CreateAd() {
           title="Avançar"
           width={160}
           variant="dark"
-          onPress={handlePreviewAd}
+          onPress={handleSubmit(handlePreviewAd)}
         />
       </HStack>
     </>
