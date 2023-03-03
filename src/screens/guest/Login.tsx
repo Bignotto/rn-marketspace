@@ -1,17 +1,77 @@
 import { TextInput } from "@components/TextInput";
-import { Center, Heading, Image, ScrollView, VStack } from "native-base";
+import {
+  Center,
+  Heading,
+  Image,
+  ScrollView,
+  useToast,
+  VStack,
+} from "native-base";
 
 import LogoPng from "@assets/logo.png";
 import { GenericButton } from "@components/GenericButton";
+import { yupResolver } from "@hookform/resolvers/yup";
+import { useAuth } from "@hooks/useAuth";
 import { useNavigation } from "@react-navigation/native";
 import { GuestRoutesNavigationProps } from "@routes/guest.routes";
+import { AppError } from "@utils/AppError";
+import { useState } from "react";
+import { Controller, useForm } from "react-hook-form";
 import { getStatusBarHeight } from "react-native-iphone-x-helper";
+import * as yup from "yup";
+
+type FormDataProps = {
+  email: string;
+  password: string;
+};
+
+const formValidation = yup.object({
+  email: yup
+    .string()
+    .required("É obrigatório um e-mail.")
+    .email("E-mail inválido."),
+  password: yup.string().required("É preciso uma senha."),
+});
 
 export function Login() {
+  const [isLoading, setIsLoading] = useState(false);
+  const { signIn, user } = useAuth();
   const navigation = useNavigation<GuestRoutesNavigationProps>();
+  const toast = useToast();
+
+  console.log({ user, message: "logado agora" });
+
+  const {
+    control,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<FormDataProps>({
+    resolver: yupResolver(formValidation),
+  });
 
   function handleNavigateSignUp() {
     navigation.navigate("signUp");
+  }
+
+  async function handleLogin({ email, password }: FormDataProps) {
+    setIsLoading(true);
+    try {
+      await signIn(email, password);
+    } catch (error) {
+      const isAppError = error instanceof AppError;
+      const title = isAppError
+        ? error.message
+        : `Não foi possível entrar.\nTente novamente mais tarde.`;
+
+      return toast.show({
+        title,
+        placement: "top",
+        bgColor: "red.500",
+        duration: 6500,
+      });
+    } finally {
+      setIsLoading(false);
+    }
   }
 
   return (
@@ -34,14 +94,38 @@ export function Login() {
           <Heading fontSize="lg">Acesse sua conta</Heading>
         </Center>
         <Center mt="4">
-          <TextInput
-            placeholder="E-mail"
-            keyboardType="email-address"
-            autoCapitalize="none"
-            mb="4"
+          <Controller
+            control={control}
+            name="email"
+            render={({ field: { onChange } }) => (
+              <TextInput
+                placeholder="E-mail"
+                keyboardType="email-address"
+                autoCapitalize="none"
+                mb="4"
+                onChangeText={onChange}
+                error={errors.email?.message}
+              />
+            )}
           />
-          <TextInput placeholder="Senha" secureTextEntry mb="4" />
-          <GenericButton title="Entrar" />
+          <Controller
+            control={control}
+            name="password"
+            render={({ field: { onChange } }) => (
+              <TextInput
+                placeholder="Senha"
+                secureTextEntry
+                mb="4"
+                onChangeText={onChange}
+                error={errors.password?.message}
+              />
+            )}
+          />
+          <GenericButton
+            title="Entrar"
+            onPress={handleSubmit(handleLogin)}
+            isLoading={isLoading}
+          />
         </Center>
       </VStack>
       <Center bgColor="gray.100" px={10} pt="16" mb="20">

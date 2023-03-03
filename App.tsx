@@ -5,6 +5,7 @@ import {
 } from "@expo-google-fonts/karla";
 import { NativeBaseProvider } from "native-base";
 
+import { AuthContextProvider } from "@contexts/AuthContext";
 import { Routes } from "@routes/index";
 import { LogBox } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
@@ -32,7 +33,9 @@ export default function App() {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <NativeBaseProvider theme={THEME}>
-        <Routes />
+        <AuthContextProvider>
+          <Routes />
+        </AuthContextProvider>
       </NativeBaseProvider>
     </GestureHandlerRootView>
   );

@@ -1,5 +1,5 @@
 export interface IUserDTO {
-  id: string;
+  id?: string;
   avatar: string;
   name: string;
   email: string;

@@ -159,14 +159,14 @@ export function Home() {
             }
           >
             <AdCard
-              image_uri={item.product_images[0].path}
+              image_uri={item.product_images![0].path}
               name={item.name}
               price={`R$ ${item.price}`}
               showAvatar
             />
           </TouchableOpacity>
         )}
-        keyExtractor={(item) => item.id}
+        keyExtractor={(item) => item.id!}
       />
       <BottomSheet
         ref={sheetRef}
