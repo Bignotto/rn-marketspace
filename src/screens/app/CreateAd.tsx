@@ -1,5 +1,6 @@
 import { GenericButton } from "@components/GenericButton";
 import { TextInput } from "@components/TextInput";
+import { yupResolver } from "@hookform/resolvers/yup";
 import { useNavigation } from "@react-navigation/native";
 import { AppNavigationRoutesProps } from "@routes/app.routes";
 import * as ImagePicker from "expo-image-picker";
@@ -14,6 +15,7 @@ import {
   Text,
   TextArea,
   useTheme,
+  useToast,
   VStack,
 } from "native-base";
 import { ArrowLeft, Plus, XCircle } from "phosphor-react-native";
@@ -21,12 +23,22 @@ import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { TouchableOpacity } from "react-native";
 import { getStatusBarHeight } from "react-native-iphone-x-helper";
+import * as yup from "yup";
 
 type FormDataProps = {
   name: string;
   description: string;
   price: string;
 };
+
+const formValidation = yup.object({
+  name: yup.string().required("O anúncio precisa de um título."),
+  description: yup
+    .string()
+    .required("Descreva o seu anúncio.")
+    .min(20, "Descreva melhor o seu anúncio."),
+  price: yup.number().typeError("Preço inválido.").positive("Preço inválido."),
+});
 
 export function CreateAd() {
   const [adImages, setAdImages] = useState<ImagePicker.ImagePickerAsset[]>([]);
@@ -36,11 +48,14 @@ export function CreateAd() {
 
   const navigation = useNavigation<AppNavigationRoutesProps>();
   const theme = useTheme();
+  const toast = useToast();
   const {
     control,
     handleSubmit,
     formState: { errors },
-  } = useForm<FormDataProps>();
+  } = useForm<FormDataProps>({
+    resolver: yupResolver(formValidation),
+  });
 
   async function handleImageSelect() {
     const selectedImages = await ImagePicker.launchImageLibraryAsync({
@@ -69,7 +84,22 @@ export function CreateAd() {
   }
 
   function handlePreviewAd({ name, description, price }: FormDataProps) {
-    console.log({ name, description, price });
+    if (payMethods.length === 0)
+      return toast.show({
+        title: "Selecione pelo menos uma condição de pagamento.",
+        placement: "top",
+        bgColor: "red.500",
+        duration: 6500,
+      });
+    console.log({
+      name,
+      description,
+      price,
+      acceptTrade,
+      payMethods,
+      adImages,
+      condition,
+    });
   }
 
   return (
@@ -158,6 +188,7 @@ export function CreateAd() {
                 mt="4"
                 value={value}
                 onChangeText={onChange}
+                error={errors.name?.message}
               />
             )}
           />
@@ -166,31 +197,39 @@ export function CreateAd() {
             control={control}
             name="description"
             render={({ field: { onChange, value } }) => (
-              <TextArea
-                placeholder="Descrição do produto"
-                h={160}
-                mt="4"
-                bg="gray.100"
-                px={4}
-                borderWidth={0}
-                fontSize="lg"
-                color="gray.700"
-                fontFamily="body"
-                placeholderTextColor="gray.400"
-                _invalid={{
-                  borderWidth: 1,
-                  borderColor: "red.500",
-                }}
-                _focus={{
-                  bgColor: "gray.100",
-                  borderWidth: 1,
-                  borderColor: "gray.400",
-                  borderRadius: "md",
-                }}
-                autoCompleteType={undefined}
-                value={value}
-                onChangeText={onChange}
-              />
+              <>
+                <TextArea
+                  placeholder="Descrição do produto"
+                  h={160}
+                  mt="4"
+                  bg="gray.100"
+                  px={4}
+                  borderWidth={0}
+                  fontSize="lg"
+                  color="gray.700"
+                  fontFamily="body"
+                  placeholderTextColor="gray.400"
+                  _invalid={{
+                    borderWidth: 1,
+                    borderColor: "red.500",
+                  }}
+                  _focus={{
+                    bgColor: "gray.100",
+                    borderWidth: 1,
+                    borderColor: "gray.400",
+                    borderRadius: "md",
+                  }}
+                  autoCompleteType={undefined}
+                  value={value}
+                  onChangeText={onChange}
+                  isInvalid={errors.description?.message ? true : false}
+                />
+                {errors.description?.message && (
+                  <Text fontFamily="body" color="red.500" mb={4} fontSize="xs">
+                    {errors.description?.message}
+                  </Text>
+                )}
+              </>
             )}
           />
         </VStack>
@@ -241,6 +280,7 @@ export function CreateAd() {
               value={value}
               onChangeText={onChange}
               keyboardType="number-pad"
+              error={errors.price?.message}
             />
           )}
         />
