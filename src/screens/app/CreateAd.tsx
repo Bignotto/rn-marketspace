@@ -3,6 +3,7 @@ import { TextInput } from "@components/TextInput";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useNavigation } from "@react-navigation/native";
 import { AppNavigationRoutesProps } from "@routes/app.routes";
+import { api } from "@services/api";
 import * as ImagePicker from "expo-image-picker";
 import {
   Box,
@@ -82,8 +83,14 @@ export function CreateAd() {
   function toggleSwitchState() {
     setAcceptTrade((a) => !a);
   }
-
-  function handlePreviewAd({ name, description, price }: FormDataProps) {
+  /*
+[x] post ad to api
+[ ] validate post was ok
+[x] upload images
+[ ] validate images?
+[x] navigate
+ */
+  async function handlePreviewAd({ name, description, price }: FormDataProps) {
     if (payMethods.length === 0)
       return toast.show({
         title: "Selecione pelo menos uma condição de pagamento.",
@@ -91,15 +98,66 @@ export function CreateAd() {
         bgColor: "red.500",
         duration: 6500,
       });
-    console.log({
+
+    if (adImages.length === 0)
+      return toast.show({
+        title: "Selecione pelo menos uma imagem para seu anúncio.",
+        placement: "top",
+        bgColor: "red.500",
+        duration: 6500,
+      });
+
+    const newProduct = {
       name,
       description,
-      price,
-      acceptTrade,
-      payMethods,
-      adImages,
-      condition,
-    });
+      price: +price,
+      accept_Trade: acceptTrade,
+      is_new: condition === "NEW",
+      payment_methods: payMethods,
+    };
+
+    console.log({ newProduct });
+
+    try {
+      const response = await api.post("/products", {
+        name,
+        description,
+        price: +price,
+        accept_trade: acceptTrade,
+        is_new: condition === "NEW",
+        payment_methods: payMethods,
+      });
+
+      const uploadData = new FormData();
+      adImages.forEach((img) => {
+        const imageFileExtension = img.uri.split(".").pop();
+        uploadData.append("images", {
+          name: `${name}.${imageFileExtension}`.toLowerCase(),
+          uri: img.uri,
+          type: `image/${imageFileExtension}`,
+        });
+      });
+      uploadData.append("product_id", response.data.id);
+
+      const uploadResponse = await api.post("products/images", uploadData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+
+      navigation.navigate("adDetails", {
+        mode: "preview",
+        adId: response.data.id,
+      });
+    } catch (error) {
+      console.log({ error });
+      return toast.show({
+        title: "Algo errado salvando anúncio.",
+        placement: "top",
+        bgColor: "red.500",
+        duration: 6500,
+      });
+    }
   }
 
   return (
@@ -304,16 +362,16 @@ export function CreateAd() {
             <Checkbox value="boleto" size="md" mt="3" colorScheme="blue">
               Boleto
             </Checkbox>
-            <Checkbox value="dinheiro" size="md" mt="3" colorScheme="blue">
+            <Checkbox value="cash" size="md" mt="3" colorScheme="blue">
               Dinheiro
             </Checkbox>
             <Checkbox value="pix" size="md" mt="2" colorScheme="blue">
               Pix
             </Checkbox>
-            <Checkbox value="cc" size="md" mt="2" colorScheme="blue">
+            <Checkbox value="card" size="md" mt="2" colorScheme="blue">
               Cartão de Crédito
             </Checkbox>
-            <Checkbox value="deposito" size="md" mt="2" colorScheme="blue">
+            <Checkbox value="deposit" size="md" mt="2" colorScheme="blue">
               Depósito Bancário
             </Checkbox>
           </Checkbox.Group>
