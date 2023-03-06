@@ -83,13 +83,7 @@ export function CreateAd() {
   function toggleSwitchState() {
     setAcceptTrade((a) => !a);
   }
-  /*
-[x] post ad to api
-[ ] validate post was ok
-[x] upload images
-[ ] validate images?
-[x] navigate
- */
+
   async function handlePreviewAd({ name, description, price }: FormDataProps) {
     if (payMethods.length === 0)
       return toast.show({
