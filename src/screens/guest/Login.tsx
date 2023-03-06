@@ -35,11 +35,9 @@ const formValidation = yup.object({
 
 export function Login() {
   const [isLoading, setIsLoading] = useState(false);
-  const { signIn, user } = useAuth();
+  const { signIn, isLoading: authLoading } = useAuth();
   const navigation = useNavigation<GuestRoutesNavigationProps>();
   const toast = useToast();
-
-  console.log({ user, message: "logado agora" });
 
   const {
     control,
@@ -124,7 +122,7 @@ export function Login() {
           <GenericButton
             title="Entrar"
             onPress={handleSubmit(handleLogin)}
-            isLoading={isLoading}
+            isLoading={isLoading || authLoading}
           />
         </Center>
       </VStack>

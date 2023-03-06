@@ -1,8 +1,9 @@
 import { GenericButton } from "@components/GenericButton";
 import { TextInput } from "@components/TextInput";
-import { IProductDTO } from "@dtos/IProductDTO";
+import { yupResolver } from "@hookform/resolvers/yup";
 import { useNavigation } from "@react-navigation/native";
-import { AdsRoutesNavigationProps } from "@routes/ads.routes";
+import { AppNavigationRoutesProps } from "@routes/app.routes";
+import { api } from "@services/api";
 import * as ImagePicker from "expo-image-picker";
 import {
   Box,
@@ -15,25 +16,47 @@ import {
   Text,
   TextArea,
   useTheme,
+  useToast,
   VStack,
 } from "native-base";
 import { ArrowLeft, Plus, XCircle } from "phosphor-react-native";
 import { useState } from "react";
+import { Controller, useForm } from "react-hook-form";
 import { TouchableOpacity } from "react-native";
 import { getStatusBarHeight } from "react-native-iphone-x-helper";
+import * as yup from "yup";
+
+type FormDataProps = {
+  name: string;
+  description: string;
+  price: string;
+};
+
+const formValidation = yup.object({
+  name: yup.string().required("O anúncio precisa de um título."),
+  description: yup
+    .string()
+    .required("Descreva o seu anúncio.")
+    .min(20, "Descreva melhor o seu anúncio."),
+  price: yup.number().typeError("Preço inválido.").positive("Preço inválido."),
+});
 
 export function CreateAd() {
-  const navigation = useNavigation<AdsRoutesNavigationProps>();
-  const theme = useTheme();
-
   const [adImages, setAdImages] = useState<ImagePicker.ImagePickerAsset[]>([]);
   const [acceptTrade, setAcceptTrade] = useState(true);
   const [payMethods, setPayMethods] = useState([]);
   const [condition, setCondition] = useState("NEW");
 
-  const [name, setName] = useState("");
-  const [description, setDescription] = useState("");
-  const [price, setPrice] = useState("");
+  const navigation = useNavigation<AppNavigationRoutesProps>();
+  const theme = useTheme();
+  const toast = useToast();
+  const {
+    control,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<FormDataProps>({
+    resolver: yupResolver(formValidation),
+  });
 
   async function handleImageSelect() {
     const selectedImages = await ImagePicker.launchImageLibraryAsync({
@@ -61,35 +84,73 @@ export function CreateAd() {
     setAcceptTrade((a) => !a);
   }
 
-  function handlePreviewAd() {
-    const previewData: IProductDTO = {
-      id: "preview",
+  async function handlePreviewAd({ name, description, price }: FormDataProps) {
+    if (payMethods.length === 0)
+      return toast.show({
+        title: "Selecione pelo menos uma condição de pagamento.",
+        placement: "top",
+        bgColor: "red.500",
+        duration: 6500,
+      });
+
+    if (adImages.length === 0)
+      return toast.show({
+        title: "Selecione pelo menos uma imagem para seu anúncio.",
+        placement: "top",
+        bgColor: "red.500",
+        duration: 6500,
+      });
+
+    const newProduct = {
       name,
       description,
-      is_active: false,
+      price: +price,
+      accept_Trade: acceptTrade,
       is_new: condition === "NEW",
-      price: parseInt(price),
-      user: {
-        id: "458e155b-7994-4e39-bd2b-b6353311f32c",
-        avatar: "4b04f3a8d21936b6d592-sample_avatar.png",
-        name: "Rocketseat",
-        email: "desafio@rocketseat.com.br",
-        tel: "+5511915839648",
-      },
-      created_at: Date.now().toLocaleString(),
-      updated_at: Date.now().toLocaleString(),
-      product_images: adImages.map((img) => {
-        return {
-          path: img.uri!,
-          id: img.assetId!,
-        };
-      }),
       payment_methods: payMethods,
-      accept_trade: acceptTrade,
-      user_id: "458e155b-7994-4e39-bd2b-b6353311f32c",
     };
 
-    console.log({ previewData });
+    try {
+      const response = await api.post("/products", {
+        name,
+        description,
+        price: +price,
+        accept_trade: acceptTrade,
+        is_new: condition === "NEW",
+        payment_methods: payMethods,
+      });
+
+      const uploadData = new FormData();
+      adImages.forEach((img) => {
+        const imageFileExtension = img.uri.split(".").pop();
+        const imageFile = {
+          name: `${name}.${imageFileExtension}`.toLowerCase(),
+          uri: img.uri,
+          type: `image/${imageFileExtension}`,
+        } as any;
+        uploadData.append("images", imageFile);
+      });
+      uploadData.append("product_id", response.data.id);
+
+      const uploadResponse = await api.post("products/images", uploadData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+
+      navigation.navigate("adDetails", {
+        mode: "preview",
+        adId: response.data.id,
+      });
+    } catch (error) {
+      console.log({ error });
+      return toast.show({
+        title: "Algo errado salvando anúncio.",
+        placement: "top",
+        bgColor: "red.500",
+        duration: 6500,
+      });
+    }
   }
 
   return (
@@ -168,37 +229,59 @@ export function CreateAd() {
           <Text fontFamily={"heading"} fontSize="md" color={"gray.700"}>
             Sobre o produto
           </Text>
-          <TextInput
-            placeholder="Título do anúncio"
-            mb="2"
-            mt="4"
-            value={name}
-            onChangeText={setName}
+          <Controller
+            control={control}
+            name="name"
+            render={({ field: { onChange, value } }) => (
+              <TextInput
+                placeholder="Título do anúncio"
+                mb="2"
+                mt="4"
+                value={value}
+                onChangeText={onChange}
+                error={errors.name?.message}
+              />
+            )}
           />
-          <TextArea
-            placeholder="Descrição do produto"
-            h={160}
-            mt="4"
-            bg="gray.100"
-            px={4}
-            borderWidth={0}
-            fontSize="lg"
-            color="gray.700"
-            fontFamily="body"
-            placeholderTextColor="gray.400"
-            _invalid={{
-              borderWidth: 1,
-              borderColor: "red.500",
-            }}
-            _focus={{
-              bgColor: "gray.100",
-              borderWidth: 1,
-              borderColor: "gray.400",
-              borderRadius: "md",
-            }}
-            autoCompleteType={undefined}
-            value={description}
-            onChangeText={setDescription}
+
+          <Controller
+            control={control}
+            name="description"
+            render={({ field: { onChange, value } }) => (
+              <>
+                <TextArea
+                  placeholder="Descrição do produto"
+                  h={160}
+                  mt="4"
+                  bg="gray.100"
+                  px={4}
+                  borderWidth={0}
+                  fontSize="lg"
+                  color="gray.700"
+                  fontFamily="body"
+                  placeholderTextColor="gray.400"
+                  _invalid={{
+                    borderWidth: 1,
+                    borderColor: "red.500",
+                  }}
+                  _focus={{
+                    bgColor: "gray.100",
+                    borderWidth: 1,
+                    borderColor: "gray.400",
+                    borderRadius: "md",
+                  }}
+                  autoCompleteType={undefined}
+                  value={value}
+                  onChangeText={onChange}
+                  isInvalid={errors.description?.message ? true : false}
+                />
+                {errors.description?.message && (
+                  <Text fontFamily="body" color="red.500" mb={4} fontSize="xs">
+                    {errors.description?.message}
+                  </Text>
+                )}
+              </>
+            )}
           />
         </VStack>
         <Radio.Group
@@ -237,12 +320,20 @@ export function CreateAd() {
         <Text fontFamily={"heading"} fontSize="md" color={"gray.700"} mt="4">
           Venda
         </Text>
-        <TextInput
-          placeholder="R$ Valor do produto"
-          mb="2"
-          mt="4"
-          value={price}
-          onChangeText={setPrice}
+        <Controller
+          control={control}
+          name="price"
+          render={({ field: { onChange, value } }) => (
+            <TextInput
+              placeholder="R$ Valor do produto"
+              mb="2"
+              mt="4"
+              value={value}
+              onChangeText={onChange}
+              keyboardType="number-pad"
+              error={errors.price?.message}
+            />
+          )}
         />
         <Text fontFamily={"heading"} fontSize="md" color={"gray.700"} mt="4">
           Aceita troca?
@@ -264,16 +355,16 @@ export function CreateAd() {
             <Checkbox value="boleto" size="md" mt="3" colorScheme="blue">
               Boleto
             </Checkbox>
-            <Checkbox value="dinheiro" size="md" mt="3" colorScheme="blue">
+            <Checkbox value="cash" size="md" mt="3" colorScheme="blue">
               Dinheiro
             </Checkbox>
             <Checkbox value="pix" size="md" mt="2" colorScheme="blue">
               Pix
             </Checkbox>
-            <Checkbox value="cc" size="md" mt="2" colorScheme="blue">
+            <Checkbox value="card" size="md" mt="2" colorScheme="blue">
               Cartão de Crédito
             </Checkbox>
-            <Checkbox value="deposito" size="md" mt="2" colorScheme="blue">
+            <Checkbox value="deposit" size="md" mt="2" colorScheme="blue">
               Depósito Bancário
             </Checkbox>
           </Checkbox.Group>
@@ -296,7 +387,7 @@ export function CreateAd() {
           title="Avançar"
           width={160}
           variant="dark"
-          onPress={handlePreviewAd}
+          onPress={handleSubmit(handlePreviewAd)}
         />
       </HStack>
     </>

@@ -28,7 +28,8 @@ export function AdImagesList({ images }: AdImagesListProps) {
       h={280}
       resizeMode="cover"
       source={{
-        uri: item.path,
+        //TODO: FIX API PATH
+        uri: `http://192.168.15.20:3333/images/${item.path}`,
       }}
     />
   );

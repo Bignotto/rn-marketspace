@@ -5,31 +5,62 @@ import { UserAvatar } from "@components/UserAvatar";
 import { IProductDTO } from "@dtos/IProductDTO";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { AdsRoutes } from "@routes/ads.routes";
-import { Box, Center, HStack, ScrollView, Spinner, Text } from "native-base";
+import { api } from "@services/api";
+import {
+  Box,
+  Center,
+  HStack,
+  ScrollView,
+  Spinner,
+  Text,
+  useToast,
+} from "native-base";
 import { ArrowLeft, PencilSimpleLine } from "phosphor-react-native";
 import { useEffect, useState } from "react";
 import { TouchableOpacity } from "react-native";
 import { getStatusBarHeight } from "react-native-iphone-x-helper";
-
-import { DATA } from "../../_sample_data";
 
 type ScreenProps = NativeStackScreenProps<AdsRoutes, "adDetails">;
 
 export function AdDetails({ navigation, route }: ScreenProps) {
   const { mode, adId } = route.params;
   const [adData, setAdData] = useState<IProductDTO | undefined>(undefined);
+  const [isLoading, setIsLoading] = useState(true);
+
+  const toast = useToast();
+
+  async function loadAd() {
+    setIsLoading(true);
+    try {
+      const response = await api.get(`/products/${adId}`);
+      console.log({ ad: response.data });
+
+      setAdData(response.data);
+    } catch (error) {
+      console.log({ error });
+      return toast.show({
+        title: "Algo errado ao recuperar o anúncio.",
+        placement: "top",
+        bgColor: "red.500",
+        duration: 6500,
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  }
 
   useEffect(() => {
-    const ad = DATA.filter((a) => a.id === adId);
-    setAdData(ad[0]);
+    loadAd();
   }, []);
 
-  if (!adData)
+  if (isLoading)
     return (
       <Center flex={1}>
         <Spinner />
       </Center>
     );
+
+  console.log({ images: adData?.product_images! });
 
   return (
     <>
@@ -97,7 +128,7 @@ export function AdDetails({ navigation, route }: ScreenProps) {
         <Text fontFamily="heading" color="gray.600" fontSize="md" mt="6">
           Meios de pagamento:
         </Text>
-        <PaymentMethodsList methods={adData.payment_methods} />
+        <PaymentMethodsList methods={adData!.payment_methods} />
       </ScrollView>
       <HStack
         h="90"
