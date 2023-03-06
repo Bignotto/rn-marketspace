@@ -116,8 +116,6 @@ export function CreateAd() {
       payment_methods: payMethods,
     };
 
-    console.log({ newProduct });
-
     try {
       const response = await api.post("/products", {
         name,
@@ -131,11 +129,12 @@ export function CreateAd() {
       const uploadData = new FormData();
       adImages.forEach((img) => {
         const imageFileExtension = img.uri.split(".").pop();
-        uploadData.append("images", {
+        const imageFile = {
           name: `${name}.${imageFileExtension}`.toLowerCase(),
           uri: img.uri,
           type: `image/${imageFileExtension}`,
-        });
+        } as any;
+        uploadData.append("images", imageFile);
       });
       uploadData.append("product_id", response.data.id);
 
