@@ -33,7 +33,6 @@ export function AdDetails({ navigation, route }: ScreenProps) {
     setIsLoading(true);
     try {
       const response = await api.get(`/products/${adId}`);
-      console.log({ ad: response.data });
 
       setAdData(response.data);
     } catch (error) {
@@ -59,8 +58,6 @@ export function AdDetails({ navigation, route }: ScreenProps) {
         <Spinner />
       </Center>
     );
-
-  console.log({ images: adData?.product_images! });
 
   return (
     <>

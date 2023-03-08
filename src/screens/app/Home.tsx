@@ -23,11 +23,9 @@ import {
   Sliders,
   Tag,
 } from "phosphor-react-native";
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { getStatusBarHeight } from "react-native-iphone-x-helper";
-
-import { DATA } from "../../_sample_data";
 
 export function Home() {
   const theme = useTheme();
@@ -55,9 +53,18 @@ export function Home() {
   async function loadAds() {
     setIsLoading(true);
     try {
-      const response = await api.get();
-    } catch (error) {}
+      const response = await api.get("/products");
+      setAds(response.data);
+    } catch (error) {
+      console.log({ error });
+    } finally {
+      setIsLoading(false);
+    }
   }
+
+  useEffect(() => {
+    loadAds();
+  }, []);
 
   return (
     <>
@@ -160,7 +167,7 @@ export function Home() {
         columnWrapperStyle={{ justifyContent: "space-between" }}
         numColumns={2}
         flex={1}
-        data={DATA}
+        data={ads}
         renderItem={({ item }) => (
           <TouchableOpacity
             onPress={() =>
