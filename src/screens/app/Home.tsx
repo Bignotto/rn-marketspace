@@ -2,9 +2,11 @@ import { AdCard } from "@components/AdCard";
 import { GenericButton } from "@components/GenericButton";
 import { SearchFilterPanel } from "@components/SearchFilterPanel";
 import { UserAvatar } from "@components/UserAvatar";
+import { IProductDTO } from "@dtos/IProductDTO";
 import BottomSheet from "@gorhom/bottom-sheet";
 import { useNavigation } from "@react-navigation/native";
-import { AdsRoutesNavigationProps } from "@routes/ads.routes";
+import { AppNavigationRoutesProps } from "@routes/app.routes";
+import { api } from "@services/api";
 import {
   Box,
   FlatList,
@@ -21,16 +23,17 @@ import {
   Sliders,
   Tag,
 } from "phosphor-react-native";
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { getStatusBarHeight } from "react-native-iphone-x-helper";
 
-import { DATA } from "../../_sample_data";
-
 export function Home() {
   const theme = useTheme();
-  const navigation = useNavigation<AdsRoutesNavigationProps>();
+  const navigation = useNavigation<AppNavigationRoutesProps>();
   const sheetRef = useRef<BottomSheet>(null);
+
+  const [ads, setAds] = useState<IProductDTO[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   const [filterModalShown, setFilterModalShown] = useState(true);
 
@@ -46,6 +49,22 @@ export function Home() {
       setFilterModalShown(false);
     }
   }
+
+  async function loadAds() {
+    setIsLoading(true);
+    try {
+      const response = await api.get("/products");
+      setAds(response.data);
+    } catch (error) {
+      console.log({ error });
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
+  useEffect(() => {
+    loadAds();
+  }, []);
 
   return (
     <>
@@ -148,7 +167,7 @@ export function Home() {
         columnWrapperStyle={{ justifyContent: "space-between" }}
         numColumns={2}
         flex={1}
-        data={DATA}
+        data={ads}
         renderItem={({ item }) => (
           <TouchableOpacity
             onPress={() =>

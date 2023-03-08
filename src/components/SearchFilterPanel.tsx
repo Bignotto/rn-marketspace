@@ -40,7 +40,6 @@ export function SearchFilterPanel() {
   }
 
   function handleResetFilters() {
-    console.log({ payMethods });
     setAcceptTrade(false);
     setPayMethods([]);
     setConditions([]);
