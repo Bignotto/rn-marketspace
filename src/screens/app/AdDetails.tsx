@@ -14,6 +14,7 @@ import {
   Spinner,
   Text,
   useToast,
+  VStack,
 } from "native-base";
 import { ArrowLeft, PencilSimpleLine } from "phosphor-react-native";
 import { useEffect, useState } from "react";
@@ -59,22 +60,55 @@ export function AdDetails({ navigation, route }: ScreenProps) {
       </Center>
     );
 
+  console.log({ adId });
+
   return (
     <>
-      <HStack mb="3" px={10} justifyContent="space-between">
-        <Box mt={getStatusBarHeight() + 36}>
-          <TouchableOpacity onPress={() => navigation.goBack()}>
-            <ArrowLeft />
-          </TouchableOpacity>
-        </Box>
-        <Box mt={getStatusBarHeight() + 36}>
-          {mode === "owner" && (
+      {mode === "preview" && (
+        <VStack px={10} backgroundColor="blue.400">
+          <Box
+            mt={getStatusBarHeight() + 36}
+            mb={36}
+            justifyContent="center"
+            alignItems="center"
+          >
+            <Text fontFamily="heading" color="white" fontSize="md">
+              Pré visualização do anúncio
+            </Text>
+            <Text fontFamily="body" color="white" fontSize="md">
+              É assim que seu anúncio irá aparecer
+            </Text>
+          </Box>
+        </VStack>
+      )}
+      {mode === "owner" && (
+        <HStack mb="3" px={10} justifyContent="space-between">
+          <Box mt={getStatusBarHeight() + 36}>
+            <TouchableOpacity onPress={() => navigation.goBack()}>
+              <ArrowLeft />
+            </TouchableOpacity>
+          </Box>
+          <Box mt={getStatusBarHeight() + 36}>
             <TouchableOpacity onPress={() => navigation.goBack()}>
               <PencilSimpleLine />
             </TouchableOpacity>
-          )}
-        </Box>
-      </HStack>
+          </Box>
+        </HStack>
+      )}
+      {mode === "detail" && (
+        <HStack mb="3" px={10} justifyContent="space-between">
+          <Box mt={getStatusBarHeight() + 36}>
+            <TouchableOpacity onPress={() => navigation.goBack()}>
+              <ArrowLeft />
+            </TouchableOpacity>
+          </Box>
+          <Box mt={getStatusBarHeight() + 36}>
+            <TouchableOpacity onPress={() => navigation.goBack()}>
+              <PencilSimpleLine />
+            </TouchableOpacity>
+          </Box>
+        </HStack>
+      )}
 
       <AdImagesList images={adData?.product_images!} />
 
@@ -127,18 +161,32 @@ export function AdDetails({ navigation, route }: ScreenProps) {
         </Text>
         <PaymentMethodsList methods={adData!.payment_methods} />
       </ScrollView>
-      <HStack
-        h="90"
-        backgroundColor="white"
-        alignItems="center"
-        justifyContent="space-between"
-        px={10}
-      >
-        <Text fontFamily="heading" fontSize="xl" color="blue.400">
-          {`R$ ${adData?.price}`}
-        </Text>
-        <GenericButton title="Entrar em Contato" width={169} />
-      </HStack>
+      {mode === "preview" && (
+        <HStack
+          h="90"
+          backgroundColor="white"
+          alignItems="center"
+          justifyContent="space-between"
+          px={10}
+        >
+          <GenericButton title="Voltar e editar" width={157} variant="light" />
+          <GenericButton title="Publicar" width={157} />
+        </HStack>
+      )}
+      {mode !== "preview" && (
+        <HStack
+          h="90"
+          backgroundColor="white"
+          alignItems="center"
+          justifyContent="space-between"
+          px={10}
+        >
+          <Text fontFamily="heading" fontSize="xl" color="blue.400">
+            {`R$ ${adData?.price}`}
+          </Text>
+          <GenericButton title="Entrar em Contato" width={169} />
+        </HStack>
+      )}
     </>
   );
 }
