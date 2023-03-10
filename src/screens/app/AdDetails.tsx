@@ -3,6 +3,7 @@ import { GenericButton } from "@components/GenericButton";
 import { PaymentMethodsList } from "@components/PaymentMethodsList";
 import { UserAvatar } from "@components/UserAvatar";
 import { IProductDTO } from "@dtos/IProductDTO";
+import { CommonActions, useFocusEffect } from "@react-navigation/native";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { AdsRoutes } from "@routes/ads.routes";
 import { api } from "@services/api";
@@ -17,7 +18,7 @@ import {
   VStack,
 } from "native-base";
 import { ArrowLeft, PencilSimpleLine } from "phosphor-react-native";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { TouchableOpacity } from "react-native";
 import { getStatusBarHeight } from "react-native-iphone-x-helper";
 
@@ -30,7 +31,32 @@ export function AdDetails({ navigation, route }: ScreenProps) {
 
   const toast = useToast();
 
+  async function handlePublishAd() {
+    setIsLoading(true);
+    try {
+      const request = api.patch(`/products/${adData!.id}`, { is_active: true });
+
+      console.log({ request });
+
+      navigation.dispatch(
+        CommonActions.reset({
+          index: 1,
+          routes: [{ name: "home" }],
+        })
+      );
+    } catch (error) {
+      console.log({ error });
+      return toast.show({
+        title: "Algo errado ao publicar o anúncio.",
+        placement: "top",
+        bgColor: "red.500",
+        duration: 6500,
+      });
+    }
+  }
+
   async function loadAd() {
+    console.log({ message: "loading ad", ad: adId });
     setIsLoading(true);
     try {
       const response = await api.get(`/products/${adId}`);
@@ -53,14 +79,18 @@ export function AdDetails({ navigation, route }: ScreenProps) {
     loadAd();
   }, []);
 
+  useFocusEffect(
+    useCallback(() => {
+      loadAd();
+    }, [route])
+  );
+
   if (isLoading)
     return (
       <Center flex={1}>
         <Spinner />
       </Center>
     );
-
-  console.log({ adId });
 
   return (
     <>
@@ -169,8 +199,18 @@ export function AdDetails({ navigation, route }: ScreenProps) {
           justifyContent="space-between"
           px={10}
         >
-          <GenericButton title="Voltar e editar" width={157} variant="light" />
-          <GenericButton title="Publicar" width={157} />
+          <GenericButton
+            title="Voltar e editar"
+            width={157}
+            variant="light"
+            onPress={() => navigation.goBack()}
+          />
+          <GenericButton
+            title="Publicar"
+            width={157}
+            onPress={handlePublishAd}
+            isLoading={isLoading}
+          />
         </HStack>
       )}
       {mode !== "preview" && (
