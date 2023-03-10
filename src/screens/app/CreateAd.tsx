@@ -46,6 +46,7 @@ export function CreateAd() {
   const [acceptTrade, setAcceptTrade] = useState(true);
   const [payMethods, setPayMethods] = useState([]);
   const [condition, setCondition] = useState("NEW");
+  const [isLoading, setIsLoading] = useState(false);
 
   const navigation = useNavigation<AppNavigationRoutesProps>();
   const theme = useTheme();
@@ -101,22 +102,14 @@ export function CreateAd() {
         duration: 6500,
       });
 
-    const newProduct = {
-      name,
-      description,
-      price: +price,
-      accept_Trade: acceptTrade,
-      is_new: condition === "NEW",
-      payment_methods: payMethods,
-    };
-
+    setIsLoading(true);
     try {
       const response = await api.post("/products", {
         name,
         description,
         price: +price,
         accept_trade: acceptTrade,
-        is_new: condition === "NEW",
+        is_new: condition === "NEW" ? true : false,
         payment_methods: payMethods,
       });
 
@@ -150,6 +143,8 @@ export function CreateAd() {
         bgColor: "red.500",
         duration: 6500,
       });
+    } finally {
+      setIsLoading(false);
     }
   }
 
@@ -388,6 +383,7 @@ export function CreateAd() {
           width={160}
           variant="dark"
           onPress={handleSubmit(handlePreviewAd)}
+          isLoading={isLoading}
         />
       </HStack>
     </>

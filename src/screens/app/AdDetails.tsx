@@ -3,6 +3,7 @@ import { GenericButton } from "@components/GenericButton";
 import { PaymentMethodsList } from "@components/PaymentMethodsList";
 import { UserAvatar } from "@components/UserAvatar";
 import { IProductDTO } from "@dtos/IProductDTO";
+import { CommonActions, useFocusEffect } from "@react-navigation/native";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { AdsRoutes } from "@routes/ads.routes";
 import { api } from "@services/api";
@@ -14,9 +15,10 @@ import {
   Spinner,
   Text,
   useToast,
+  VStack,
 } from "native-base";
 import { ArrowLeft, PencilSimpleLine } from "phosphor-react-native";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { TouchableOpacity } from "react-native";
 import { getStatusBarHeight } from "react-native-iphone-x-helper";
 
@@ -29,7 +31,32 @@ export function AdDetails({ navigation, route }: ScreenProps) {
 
   const toast = useToast();
 
+  async function handlePublishAd() {
+    setIsLoading(true);
+    try {
+      const request = api.patch(`/products/${adData!.id}`, { is_active: true });
+
+      console.log({ request });
+
+      navigation.dispatch(
+        CommonActions.reset({
+          index: 1,
+          routes: [{ name: "home" }],
+        })
+      );
+    } catch (error) {
+      console.log({ error });
+      return toast.show({
+        title: "Algo errado ao publicar o anúncio.",
+        placement: "top",
+        bgColor: "red.500",
+        duration: 6500,
+      });
+    }
+  }
+
   async function loadAd() {
+    console.log({ message: "loading ad", ad: adId });
     setIsLoading(true);
     try {
       const response = await api.get(`/products/${adId}`);
@@ -52,6 +79,12 @@ export function AdDetails({ navigation, route }: ScreenProps) {
     loadAd();
   }, []);
 
+  useFocusEffect(
+    useCallback(() => {
+      loadAd();
+    }, [route])
+  );
+
   if (isLoading)
     return (
       <Center flex={1}>
@@ -61,20 +94,51 @@ export function AdDetails({ navigation, route }: ScreenProps) {
 
   return (
     <>
-      <HStack mb="3" px={10} justifyContent="space-between">
-        <Box mt={getStatusBarHeight() + 36}>
-          <TouchableOpacity onPress={() => navigation.goBack()}>
-            <ArrowLeft />
-          </TouchableOpacity>
-        </Box>
-        <Box mt={getStatusBarHeight() + 36}>
-          {mode === "owner" && (
+      {mode === "preview" && (
+        <VStack px={10} backgroundColor="blue.400">
+          <Box
+            mt={getStatusBarHeight() + 36}
+            mb={36}
+            justifyContent="center"
+            alignItems="center"
+          >
+            <Text fontFamily="heading" color="white" fontSize="md">
+              Pré visualização do anúncio
+            </Text>
+            <Text fontFamily="body" color="white" fontSize="md">
+              É assim que seu anúncio irá aparecer
+            </Text>
+          </Box>
+        </VStack>
+      )}
+      {mode === "owner" && (
+        <HStack mb="3" px={10} justifyContent="space-between">
+          <Box mt={getStatusBarHeight() + 36}>
+            <TouchableOpacity onPress={() => navigation.goBack()}>
+              <ArrowLeft />
+            </TouchableOpacity>
+          </Box>
+          <Box mt={getStatusBarHeight() + 36}>
             <TouchableOpacity onPress={() => navigation.goBack()}>
               <PencilSimpleLine />
             </TouchableOpacity>
-          )}
-        </Box>
-      </HStack>
+          </Box>
+        </HStack>
+      )}
+      {mode === "detail" && (
+        <HStack mb="3" px={10} justifyContent="space-between">
+          <Box mt={getStatusBarHeight() + 36}>
+            <TouchableOpacity onPress={() => navigation.goBack()}>
+              <ArrowLeft />
+            </TouchableOpacity>
+          </Box>
+          <Box mt={getStatusBarHeight() + 36}>
+            <TouchableOpacity onPress={() => navigation.goBack()}>
+              <PencilSimpleLine />
+            </TouchableOpacity>
+          </Box>
+        </HStack>
+      )}
 
       <AdImagesList images={adData?.product_images!} />
 
@@ -127,18 +191,42 @@ export function AdDetails({ navigation, route }: ScreenProps) {
         </Text>
         <PaymentMethodsList methods={adData!.payment_methods} />
       </ScrollView>
-      <HStack
-        h="90"
-        backgroundColor="white"
-        alignItems="center"
-        justifyContent="space-between"
-        px={10}
-      >
-        <Text fontFamily="heading" fontSize="xl" color="blue.400">
-          {`R$ ${adData?.price}`}
-        </Text>
-        <GenericButton title="Entrar em Contato" width={169} />
-      </HStack>
+      {mode === "preview" && (
+        <HStack
+          h="90"
+          backgroundColor="white"
+          alignItems="center"
+          justifyContent="space-between"
+          px={10}
+        >
+          <GenericButton
+            title="Voltar e editar"
+            width={157}
+            variant="light"
+            onPress={() => navigation.goBack()}
+          />
+          <GenericButton
+            title="Publicar"
+            width={157}
+            onPress={handlePublishAd}
+            isLoading={isLoading}
+          />
+        </HStack>
+      )}
+      {mode !== "preview" && (
+        <HStack
+          h="90"
+          backgroundColor="white"
+          alignItems="center"
+          justifyContent="space-between"
+          px={10}
+        >
+          <Text fontFamily="heading" fontSize="xl" color="blue.400">
+            {`R$ ${adData?.price}`}
+          </Text>
+          <GenericButton title="Entrar em Contato" width={169} />
+        </HStack>
+      )}
     </>
   );
 }

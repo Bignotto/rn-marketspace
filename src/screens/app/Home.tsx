@@ -170,12 +170,13 @@ export function Home() {
         data={ads}
         renderItem={({ item }) => (
           <TouchableOpacity
-            onPress={() =>
+            onPress={() => {
+              console.log({ item_id: item.id });
               navigation.navigate("adDetails", {
                 mode: "detail",
                 adId: item.id,
-              })
-            }
+              });
+            }}
           >
             <AdCard
               image_uri={item.product_images![0].path}
