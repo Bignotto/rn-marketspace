@@ -7,6 +7,8 @@ type AdCardProps = {
   price: string;
   showAvatar?: boolean;
   isActive?: boolean;
+  avatarUri?: string;
+  isNew?: boolean;
 };
 
 export function AdCard({
@@ -15,6 +17,8 @@ export function AdCard({
   price,
   showAvatar = false,
   isActive = true,
+  avatarUri,
+  isNew = false,
 }: AdCardProps) {
   const { user } = useAuth();
 
@@ -31,7 +35,7 @@ export function AdCard({
           h={28}
           borderRadius="full"
           source={{
-            uri: `http://192.168.15.20:3333/images/${user.avatar}`,
+            uri: avatarUri,
           }}
         />
       )}
@@ -47,7 +51,7 @@ export function AdCard({
         top="1"
       >
         <Text color="gray.100" fontSize="xs">
-          USADO
+          {isNew ? `NOVO` : `USADO`}
         </Text>
       </Box>
       {!isActive && (

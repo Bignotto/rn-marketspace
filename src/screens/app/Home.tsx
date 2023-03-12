@@ -84,7 +84,7 @@ export function Home() {
                 Boas vindas,
               </Text>
               <Text fontFamily="heading" fontSize="md">
-                Thiago
+                {user.name}
               </Text>
             </Box>
           </HStack>
@@ -186,6 +186,8 @@ export function Home() {
               name={item.name}
               price={`R$ ${item.price}`}
               showAvatar
+              avatarUri={`http://192.168.15.20:3333/images/${item.user?.avatar}`}
+              isNew={item.is_new}
             />
           </TouchableOpacity>
         )}
