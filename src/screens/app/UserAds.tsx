@@ -1,5 +1,8 @@
 import { AdCard } from "@components/AdCard";
 import { IProductDTO } from "@dtos/IProductDTO";
+import { NativeStackScreenProps } from "@react-navigation/native-stack";
+import { AdsRoutes } from "@routes/ads.routes";
+import { api } from "@services/api";
 import {
   Box,
   Center,
@@ -9,83 +12,39 @@ import {
   Text,
   VStack,
 } from "native-base";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { TouchableOpacity } from "react-native-gesture-handler";
 import { getStatusBarHeight } from "react-native-iphone-x-helper";
 
-const DATA: IProductDTO[] = [
-  {
-    id: "7a58dfe1-0ac9-4cee-accb-29dba5a51880",
-    name: "Game Boy",
-    description: "Game boy original, funcionando!",
-    is_new: false,
-    price: 300,
-    accept_trade: false,
-    user_id: "458e155b-7994-4e39-bd2b-b6353311f32c",
-    user: {
-      id: "458e155b-7994-4e39-bd2b-b6353311f32c",
-      avatar: "4b04f3a8d21936b6d592-sample_avatar.png",
-      name: "Rocketseat",
-      email: "desafio@rocketseat.com.br",
-      tel: "+5511915839648",
-    },
-    is_active: false,
-    created_at: "2023-01-21T22:03:52.752Z",
-    updated_at: "2023-01-21T22:03:52.752Z",
-    product_images: [
-      {
-        path: "https://tm.ibxk.com.br/2016/02/23/23175905693270.jpg",
-        id: "5aadef9f-465a-49c8-9a71-dca2aa339271",
-      },
-    ],
-    payment_methods: [
-      {
-        key: "pix",
-        name: "Pix",
-      },
-    ],
-  },
-  {
-    id: "7a58dfe1-0ac9-4cee-accb-29dba5a51881",
-    name: "Game Boy",
-    description: "Game boy original, funcionando!",
-    is_new: false,
-    price: 300,
-    accept_trade: false,
-    user_id: "458e155b-7994-4e39-bd2b-b6353311f32c",
-    user: {
-      id: "458e155b-7994-4e39-bd2b-b6353311f32c",
-      avatar: "4b04f3a8d21936b6d592-sample_avatar.png",
-      name: "Rocketseat",
-      email: "desafio@rocketseat.com.br",
-      tel: "+5511915839648",
-    },
-    is_active: true,
-    created_at: "2023-01-21T22:03:52.752Z",
-    updated_at: "2023-01-21T22:03:52.752Z",
-    product_images: [
-      {
-        path: "https://s2.glbimg.com/PLK5WTBnpcwO_6Tn1WDOcMliUL8=/0x0:695x391/984x0/smart/filters:strip_icc()/s.glbimg.com/po/tt2/f/original/2016/07/15/top10n64.jpg",
-        id: "5aadef9f-465a-49c8-9a71-dca2aa339271",
-      },
-    ],
-    payment_methods: [
-      {
-        key: "pix",
-        name: "Pix",
-      },
-    ],
-  },
-];
+type ScreenProps = NativeStackScreenProps<AdsRoutes, "adDetails">;
 
-export function UserAds() {
+export function UserAds({ navigation, route }: ScreenProps) {
+  const [isLoading, setIsLoading] = useState(true);
+  const [ads, setAds] = useState<IProductDTO[]>([]);
   const [filter, setFilter] = useState("all");
+
+  async function loadAds() {
+    setIsLoading(true);
+    try {
+      const response = await api.get("/users/products");
+      setAds(response.data);
+    } catch (error) {
+      console.log({ error });
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
+  useEffect(() => {
+    loadAds();
+  }, []);
 
   const dataToShow =
     filter === "all"
-      ? DATA.map((i) => i)
+      ? ads.map((i) => i)
       : filter === "active"
-      ? DATA.filter((i) => i.is_active)
-      : DATA.filter((i) => !i.is_active);
+      ? ads.filter((i) => i.is_active)
+      : ads.filter((i) => !i.is_active);
 
   return (
     <VStack flex={1} px={10}>
@@ -117,15 +76,26 @@ export function UserAds() {
         numColumns={2}
         flex={1}
         data={dataToShow}
+        keyExtractor={(item) => item.id!}
+        //TODO: better renderItem
         renderItem={({ item }) => (
-          <AdCard
-            image_uri={item.product_images[0].path}
-            name={item.name}
-            price={`R$ ${item.price.toFixed(2)}`}
-            isActive={item.is_active}
-          />
+          <TouchableOpacity
+            onPress={() => {
+              console.log({ item_id: item.id });
+              navigation.navigate("adDetails", {
+                mode: "owner",
+                adId: item.id,
+              });
+            }}
+          >
+            <AdCard
+              image_uri={item.product_images![0].path}
+              name={item.name}
+              price={`R$ ${item.price.toFixed(2)}`}
+              isActive={item.is_active}
+            />
+          </TouchableOpacity>
         )}
-        keyExtractor={(item) => item.id}
       />
     </VStack>
   );
