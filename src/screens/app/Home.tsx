@@ -4,6 +4,7 @@ import { SearchFilterPanel } from "@components/SearchFilterPanel";
 import { UserAvatar } from "@components/UserAvatar";
 import { IProductDTO } from "@dtos/IProductDTO";
 import BottomSheet from "@gorhom/bottom-sheet";
+import { useAuth } from "@hooks/useAuth";
 import { useNavigation } from "@react-navigation/native";
 import { AppNavigationRoutesProps } from "@routes/app.routes";
 import { api } from "@services/api";
@@ -31,6 +32,8 @@ export function Home() {
   const theme = useTheme();
   const navigation = useNavigation<AppNavigationRoutesProps>();
   const sheetRef = useRef<BottomSheet>(null);
+
+  const { user } = useAuth();
 
   const [ads, setAds] = useState<IProductDTO[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -73,7 +76,7 @@ export function Home() {
         <HStack mt={getStatusBarHeight() + 20} justifyContent="space-between">
           <HStack w="60%">
             <UserAvatar
-              avatar_uri="https://avatars.githubusercontent.com/u/2911353?v=4"
+              avatar_uri={`http://192.168.15.20:3333/images/${user.avatar}`}
               size={45}
             />
             <Box ml="2">

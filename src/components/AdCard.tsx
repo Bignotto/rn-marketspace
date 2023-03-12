@@ -1,3 +1,4 @@
+import { useAuth } from "@hooks/useAuth";
 import { Box, Heading, Image, Text, VStack } from "native-base";
 
 type AdCardProps = {
@@ -15,6 +16,8 @@ export function AdCard({
   showAvatar = false,
   isActive = true,
 }: AdCardProps) {
+  const { user } = useAuth();
+
   return (
     <VStack h={143}>
       {showAvatar && (
@@ -28,7 +31,7 @@ export function AdCard({
           h={28}
           borderRadius="full"
           source={{
-            uri: "https://avatars.githubusercontent.com/u/2911353?v=4",
+            uri: `http://192.168.15.20:3333/images/${user.avatar}`,
           }}
         />
       )}
