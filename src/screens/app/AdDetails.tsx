@@ -149,7 +149,7 @@ export function AdDetails({ navigation, route }: ScreenProps) {
       >
         <HStack alignItems="center" mt="6">
           <UserAvatar
-            avatar_uri="https://avatars.githubusercontent.com/u/2911353?v=4"
+            avatar_uri={`http://192.168.15.20:3333/images/${adData?.user?.avatar}`}
             size={12}
           />
           <Text ml="2" fontSize="md" fontFamily="body">
