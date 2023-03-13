@@ -5,7 +5,7 @@ import { UserAvatar } from "@components/UserAvatar";
 import { IProductDTO } from "@dtos/IProductDTO";
 import { CommonActions, useFocusEffect } from "@react-navigation/native";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
-import { AdsRoutes } from "@routes/ads.routes";
+import { AppRoutes } from "@routes/app.routes";
 import { api } from "@services/api";
 import {
   Box,
@@ -22,7 +22,7 @@ import { useCallback, useEffect, useState } from "react";
 import { TouchableOpacity } from "react-native";
 import { getStatusBarHeight } from "react-native-iphone-x-helper";
 
-type ScreenProps = NativeStackScreenProps<AdsRoutes, "adDetails">;
+type ScreenProps = NativeStackScreenProps<AppRoutes, "adDetails">;
 
 export function AdDetails({ navigation, route }: ScreenProps) {
   const { mode, adId } = route.params;
@@ -56,7 +56,6 @@ export function AdDetails({ navigation, route }: ScreenProps) {
   }
 
   async function loadAd() {
-    console.log({ message: "loading ad", ad: adId });
     setIsLoading(true);
     try {
       const response = await api.get(`/products/${adId}`);
@@ -119,7 +118,14 @@ export function AdDetails({ navigation, route }: ScreenProps) {
             </TouchableOpacity>
           </Box>
           <Box mt={getStatusBarHeight() + 36}>
-            <TouchableOpacity onPress={() => navigation.goBack()}>
+            <TouchableOpacity
+              onPress={() =>
+                navigation.navigate("createAd", {
+                  mode: "edit",
+                  adId,
+                })
+              }
+            >
               <PencilSimpleLine />
             </TouchableOpacity>
           </Box>

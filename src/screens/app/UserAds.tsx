@@ -1,7 +1,7 @@
 import { AdCard } from "@components/AdCard";
 import { IProductDTO } from "@dtos/IProductDTO";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
-import { AdsRoutes } from "@routes/ads.routes";
+import { AppRoutes } from "@routes/app.routes";
 import { api } from "@services/api";
 import {
   Box,
@@ -16,7 +16,7 @@ import { useEffect, useState } from "react";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { getStatusBarHeight } from "react-native-iphone-x-helper";
 
-type ScreenProps = NativeStackScreenProps<AdsRoutes, "adDetails">;
+type ScreenProps = NativeStackScreenProps<AppRoutes, "userAds">;
 
 export function UserAds({ navigation, route }: ScreenProps) {
   const [isLoading, setIsLoading] = useState(true);

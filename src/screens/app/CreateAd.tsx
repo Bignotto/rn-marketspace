@@ -1,8 +1,10 @@
 import { GenericButton } from "@components/GenericButton";
 import { TextInput } from "@components/TextInput";
+import { IProductDTO } from "@dtos/IProductDTO";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { useNavigation } from "@react-navigation/native";
-import { AppNavigationRoutesProps } from "@routes/app.routes";
+import { useFocusEffect } from "@react-navigation/native";
+import { NativeStackScreenProps } from "@react-navigation/native-stack";
+import { AppRoutes } from "@routes/app.routes";
 import { api } from "@services/api";
 import * as ImagePicker from "expo-image-picker";
 import {
@@ -20,7 +22,7 @@ import {
   VStack,
 } from "native-base";
 import { ArrowLeft, Plus, XCircle } from "phosphor-react-native";
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { TouchableOpacity } from "react-native";
 import { getStatusBarHeight } from "react-native-iphone-x-helper";
@@ -32,6 +34,13 @@ type FormDataProps = {
   price: string;
 };
 
+type ScreenProps = NativeStackScreenProps<AppRoutes, "createAd">;
+
+type AppImagesList = {
+  id: string | undefined;
+  path: string;
+};
+
 const formValidation = yup.object({
   name: yup.string().required("O anúncio precisa de um título."),
   description: yup
@@ -41,14 +50,16 @@ const formValidation = yup.object({
   price: yup.number().typeError("Preço inválido.").positive("Preço inválido."),
 });
 
-export function CreateAd() {
-  const [adImages, setAdImages] = useState<ImagePicker.ImagePickerAsset[]>([]);
+export function CreateAd({ navigation, route }: ScreenProps) {
+  const { mode, adId } = route.params;
+  const [adImages, setAdImages] = useState<AppImagesList[]>([]);
   const [acceptTrade, setAcceptTrade] = useState(true);
   const [payMethods, setPayMethods] = useState([]);
   const [condition, setCondition] = useState("NEW");
   const [isLoading, setIsLoading] = useState(false);
 
-  const navigation = useNavigation<AppNavigationRoutesProps>();
+  const [adData, setAdData] = useState<IProductDTO | undefined>(undefined);
+
   const theme = useTheme();
   const toast = useToast();
   const {
@@ -69,11 +80,16 @@ export function CreateAd() {
 
     if (selectedImages.canceled) return;
 
-    setAdImages((act) => [...act, selectedImages.assets[0]]);
+    const newImage: AppImagesList = {
+      id: selectedImages.assets[0].uri,
+      path: selectedImages.assets[0].uri,
+    };
+
+    setAdImages([...adImages, newImage]);
   }
 
   function handleRemoveImage(uri: string) {
-    const filtered = adImages.filter((img) => img.uri !== uri);
+    const filtered = adImages.filter((img) => img.path !== uri);
     setAdImages(filtered);
   }
 
@@ -115,10 +131,10 @@ export function CreateAd() {
 
       const uploadData = new FormData();
       adImages.forEach((img) => {
-        const imageFileExtension = img.uri.split(".").pop();
+        const imageFileExtension = img.path.split(".").pop();
         const imageFile = {
           name: `${name}.${imageFileExtension}`.toLowerCase(),
-          uri: img.uri,
+          uri: img.path,
           type: `image/${imageFileExtension}`,
         } as any;
         uploadData.append("images", imageFile);
@@ -148,6 +164,37 @@ export function CreateAd() {
     }
   }
 
+  async function loadAd() {
+    if (mode !== "edit") return;
+    setIsLoading(true);
+
+    try {
+      const response = await api.get(`/products/${adId}`);
+      setAdData(response.data);
+      setAdImages(response.data.product_images);
+    } catch (error) {
+      console.log({ error });
+      return toast.show({
+        title: "Algo errado ao recuperar o anúncio.",
+        placement: "top",
+        bgColor: "red.500",
+        duration: 6500,
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
+  useEffect(() => {
+    loadAd();
+  }, []);
+
+  useFocusEffect(
+    useCallback(() => {
+      loadAd();
+    }, [route])
+  );
+
   return (
     <>
       <HStack
@@ -175,14 +222,14 @@ export function CreateAd() {
 
         <HStack mt="3">
           {adImages.map((img) => (
-            <Box key={img.uri}>
+            <Box key={img.path}>
               <Image
                 alt="user product image"
                 w={100}
                 h={100}
                 resizeMode="cover"
                 source={{
-                  uri: img.uri,
+                  uri: img.path,
                 }}
                 borderRadius={6}
                 mr={4}
@@ -196,7 +243,7 @@ export function CreateAd() {
                 backgroundColor="white"
                 borderRadius="full"
               >
-                <TouchableOpacity onPress={() => handleRemoveImage(img.uri)}>
+                <TouchableOpacity onPress={() => handleRemoveImage(img.path)}>
                   <XCircle
                     weight="fill"
                     size={20}
