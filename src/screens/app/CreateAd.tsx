@@ -39,6 +39,7 @@ type ScreenProps = NativeStackScreenProps<AppRoutes, "createAd">;
 type AppImagesList = {
   id: string | undefined;
   path: string;
+  local: boolean;
 };
 
 const formValidation = yup.object({
@@ -54,17 +55,16 @@ export function CreateAd({ navigation, route }: ScreenProps) {
   const { mode, adId } = route.params;
   const [adImages, setAdImages] = useState<AppImagesList[]>([]);
   const [acceptTrade, setAcceptTrade] = useState(true);
-  const [payMethods, setPayMethods] = useState([]);
+  const [payMethods, setPayMethods] = useState<string[]>([]);
   const [condition, setCondition] = useState("NEW");
   const [isLoading, setIsLoading] = useState(false);
-
-  const [adData, setAdData] = useState<IProductDTO | undefined>(undefined);
 
   const theme = useTheme();
   const toast = useToast();
   const {
     control,
     handleSubmit,
+    setValue,
     formState: { errors },
   } = useForm<FormDataProps>({
     resolver: yupResolver(formValidation),
@@ -83,6 +83,7 @@ export function CreateAd({ navigation, route }: ScreenProps) {
     const newImage: AppImagesList = {
       id: selectedImages.assets[0].uri,
       path: selectedImages.assets[0].uri,
+      local: true,
     };
 
     setAdImages([...adImages, newImage]);
@@ -130,15 +131,17 @@ export function CreateAd({ navigation, route }: ScreenProps) {
       });
 
       const uploadData = new FormData();
-      adImages.forEach((img) => {
-        const imageFileExtension = img.path.split(".").pop();
-        const imageFile = {
-          name: `${name}.${imageFileExtension}`.toLowerCase(),
-          uri: img.path,
-          type: `image/${imageFileExtension}`,
-        } as any;
-        uploadData.append("images", imageFile);
-      });
+      adImages
+        .filter((img) => img.local === true)
+        .forEach((img) => {
+          const imageFileExtension = img.path.split(".").pop();
+          const imageFile = {
+            name: `${name}.${imageFileExtension}`.toLowerCase(),
+            uri: img.path,
+            type: `image/${imageFileExtension}`,
+          } as any;
+          uploadData.append("images", imageFile);
+        });
       uploadData.append("product_id", response.data.id);
 
       const uploadResponse = await api.post("products/images", uploadData, {
@@ -165,13 +168,28 @@ export function CreateAd({ navigation, route }: ScreenProps) {
   }
 
   async function loadAd() {
-    if (mode !== "edit") return;
+    if (mode !== "edit") {
+      setAdImages([]);
+      setPayMethods([]);
+      setCondition("NEW");
+      setAcceptTrade(false);
+      return;
+    }
     setIsLoading(true);
 
     try {
       const response = await api.get(`/products/${adId}`);
-      setAdData(response.data);
+      const adData: IProductDTO = response.data;
+
       setAdImages(response.data.product_images);
+
+      setValue("name", adData.name);
+      setValue("description", adData.description);
+      setValue("price", `${adData.price}`);
+
+      setPayMethods(adData.payment_methods.map((p) => p.key));
+      setAcceptTrade(adData.accept_trade);
+      setCondition(adData.is_new ? "NEW" : "USED");
     } catch (error) {
       console.log({ error });
       return toast.show({
@@ -229,7 +247,9 @@ export function CreateAd({ navigation, route }: ScreenProps) {
                 h={100}
                 resizeMode="cover"
                 source={{
-                  uri: img.path,
+                  uri: img.local
+                    ? img.path
+                    : `http://192.168.15.20:3333/images/${img.path}`,
                 }}
                 borderRadius={6}
                 mr={4}
