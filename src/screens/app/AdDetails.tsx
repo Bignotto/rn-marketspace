@@ -220,18 +220,16 @@ export function AdDetails({ navigation, route }: ScreenProps) {
         </HStack>
       )}
       {mode !== "preview" && (
-        <HStack
-          h="90"
+        <VStack
+          h={110}
           backgroundColor="white"
           alignItems="center"
-          justifyContent="space-between"
           px={10}
+          py="3"
         >
-          <Text fontFamily="heading" fontSize="xl" color="blue.400">
-            {`R$ ${adData?.price}`}
-          </Text>
-          <GenericButton title="Entrar em Contato" width={169} />
-        </HStack>
+          <GenericButton title="Desativar anúncio" variant="dark" />
+          <GenericButton title="Excluir anúncio" mt="2" variant="light" />
+        </VStack>
       )}
     </>
   );

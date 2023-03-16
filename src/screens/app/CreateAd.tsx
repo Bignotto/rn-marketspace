@@ -102,7 +102,7 @@ export function CreateAd({ navigation, route }: ScreenProps) {
     setAcceptTrade((a) => !a);
   }
 
-  async function handlePreviewAd({ name, description, price }: FormDataProps) {
+  async function handleSaveAd({ name, description, price }: FormDataProps) {
     if (payMethods.length === 0)
       return toast.show({
         title: "Selecione pelo menos uma condição de pagamento.",
@@ -121,38 +121,58 @@ export function CreateAd({ navigation, route }: ScreenProps) {
 
     setIsLoading(true);
     try {
-      const response = await api.post("/products", {
-        name,
-        description,
-        price: +price,
-        accept_trade: acceptTrade,
-        is_new: condition === "NEW" ? true : false,
-        payment_methods: payMethods,
-      });
+      let response;
 
-      const uploadData = new FormData();
-      adImages
-        .filter((img) => img.local === true)
-        .forEach((img) => {
-          const imageFileExtension = img.path.split(".").pop();
-          const imageFile = {
-            name: `${name}.${imageFileExtension}`.toLowerCase(),
-            uri: img.path,
-            type: `image/${imageFileExtension}`,
-          } as any;
-          uploadData.append("images", imageFile);
+      if (mode === "new") {
+        response = await api.post("/products", {
+          name,
+          description,
+          price: +price,
+          accept_trade: acceptTrade,
+          is_new: condition === "NEW" ? true : false,
+          payment_methods: payMethods,
         });
-      uploadData.append("product_id", response.data.id);
+      } else {
+        console.log(`/products/${adId}`);
+        response = await api.put(`/products/${adId}`, {
+          name,
+          description,
+          price: +price,
+          accept_trade: acceptTrade,
+          is_new: condition === "NEW" ? true : false,
+          payment_methods: payMethods,
+        });
+      }
 
-      const uploadResponse = await api.post("products/images", uploadData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      });
+      if (adImages.filter((img) => img.local === true).length > 0) {
+        const uploadData = new FormData();
+        adImages
+          .filter((img) => img.local === true)
+          .forEach((img) => {
+            const imageFileExtension = img.path.split(".").pop();
+            const imageFile = {
+              name: `${name}.${imageFileExtension}`.toLowerCase(),
+              uri: img.path,
+              type: `image/${imageFileExtension}`,
+            } as any;
+            uploadData.append("images", imageFile);
+          });
+
+        uploadData.append(
+          "product_id",
+          mode === "new" ? response.data.id : adId
+        );
+
+        const uploadResponse = await api.post("products/images", uploadData, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        });
+      }
 
       navigation.navigate("adDetails", {
         mode: "preview",
-        adId: response.data.id,
+        adId: mode === "new" ? response.data.id : adId,
       });
     } catch (error) {
       console.log({ error });
@@ -449,7 +469,7 @@ export function CreateAd({ navigation, route }: ScreenProps) {
           title="Avançar"
           width={160}
           variant="dark"
-          onPress={handleSubmit(handlePreviewAd)}
+          onPress={handleSubmit(handleSaveAd)}
           isLoading={isLoading}
         />
       </HStack>
