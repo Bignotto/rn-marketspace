@@ -1,5 +1,6 @@
 import { AdCard } from "@components/AdCard";
 import { IProductDTO } from "@dtos/IProductDTO";
+import { useFocusEffect } from "@react-navigation/native";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { AppRoutes } from "@routes/app.routes";
 import { api } from "@services/api";
@@ -12,7 +13,7 @@ import {
   Text,
   VStack,
 } from "native-base";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { getStatusBarHeight } from "react-native-iphone-x-helper";
 
@@ -38,6 +39,12 @@ export function UserAds({ navigation, route }: ScreenProps) {
   useEffect(() => {
     loadAds();
   }, []);
+
+  useFocusEffect(
+    useCallback(() => {
+      loadAds();
+    }, [])
+  );
 
   const dataToShow =
     filter === "all"

@@ -1,4 +1,4 @@
-import { Box, FlatList, HStack, Image } from "native-base";
+import { Box, FlatList, HStack, Image, Text } from "native-base";
 import { useCallback, useState } from "react";
 import { Dimensions, ListRenderItem, ViewToken } from "react-native";
 
@@ -9,29 +9,33 @@ type Item = {
 
 type AdImagesListProps = {
   images: Item[];
+  isActive: boolean;
 };
 
 type HandleScrollProps = {
   viewableItems: Array<ViewToken>;
 };
 
-export function AdImagesList({ images }: AdImagesListProps) {
+export function AdImagesList({ images, isActive }: AdImagesListProps) {
   const imageCount = images.length;
   const imageIndexWidth = (Dimensions.get("window").width - 4) / imageCount;
 
   const [viewIndex, setViewIndex] = useState(0);
 
   const renderItem: ListRenderItem<Item> = ({ item }) => (
-    <Image
-      alt="user product image"
-      w={Dimensions.get("window").width}
-      h={280}
-      resizeMode="cover"
-      source={{
-        //TODO: FIX API PATH
-        uri: `http://192.168.15.20:3333/images/${item.path}`,
-      }}
-    />
+    <>
+      //TODO:add here the opacity box
+      <Image
+        alt="user product image"
+        w={Dimensions.get("window").width}
+        h={280}
+        resizeMode="cover"
+        source={{
+          //TODO: FIX API PATH
+          uri: `http://192.168.15.20:3333/images/${item.path}`,
+        }}
+      />
+    </>
   );
 
   const onViewChangeCallback = useCallback(
@@ -69,6 +73,28 @@ export function AdImagesList({ images }: AdImagesListProps) {
           />
         ))}
       </HStack>
+      {isActive && (
+        <Box
+          position="absolute"
+          // opacity={0.5}
+          zIndex={3}
+          backgroundColor="yellow.400"
+          h={200}
+          w={200}
+        >
+          <Text
+            position="absolute"
+            zIndex={3}
+            fontFamily="heading"
+            fontSize="xs"
+            color="white"
+            bottom="12"
+            left="2"
+          >
+            ANÚNCIO DESATIVADO
+          </Text>
+        </Box>
+      )}
     </Box>
   );
 }

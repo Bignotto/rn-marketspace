@@ -133,7 +133,6 @@ export function CreateAd({ navigation, route }: ScreenProps) {
           payment_methods: payMethods,
         });
       } else {
-        console.log(`/products/${adId}`);
         response = await api.put(`/products/${adId}`, {
           name,
           description,
