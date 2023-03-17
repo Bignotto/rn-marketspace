@@ -11,11 +11,14 @@ import { UserAds } from "@screens/app/UserAds";
 import { useTheme } from "native-base";
 import { House, SignOut, Tag } from "phosphor-react-native";
 
-type AppRoutes = {
+export type AppRoutes = {
   home: undefined;
   userAds: undefined;
   signOut: undefined;
-  createAd: undefined;
+  createAd: {
+    mode: "new" | "edit";
+    adId?: string | undefined;
+  };
   adDetails: {
     mode:
       | "detail" //when user tap to see the ad

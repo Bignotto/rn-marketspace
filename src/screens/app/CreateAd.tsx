@@ -1,8 +1,10 @@
 import { GenericButton } from "@components/GenericButton";
 import { TextInput } from "@components/TextInput";
+import { IProductDTO } from "@dtos/IProductDTO";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { useNavigation } from "@react-navigation/native";
-import { AppNavigationRoutesProps } from "@routes/app.routes";
+import { useFocusEffect } from "@react-navigation/native";
+import { NativeStackScreenProps } from "@react-navigation/native-stack";
+import { AppRoutes } from "@routes/app.routes";
 import { api } from "@services/api";
 import * as ImagePicker from "expo-image-picker";
 import {
@@ -20,7 +22,7 @@ import {
   VStack,
 } from "native-base";
 import { ArrowLeft, Plus, XCircle } from "phosphor-react-native";
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { TouchableOpacity } from "react-native";
 import { getStatusBarHeight } from "react-native-iphone-x-helper";
@@ -32,6 +34,14 @@ type FormDataProps = {
   price: string;
 };
 
+type ScreenProps = NativeStackScreenProps<AppRoutes, "createAd">;
+
+type AppImagesList = {
+  id: string | undefined;
+  path: string;
+  local: boolean;
+};
+
 const formValidation = yup.object({
   name: yup.string().required("O anúncio precisa de um título."),
   description: yup
@@ -41,19 +51,20 @@ const formValidation = yup.object({
   price: yup.number().typeError("Preço inválido.").positive("Preço inválido."),
 });
 
-export function CreateAd() {
-  const [adImages, setAdImages] = useState<ImagePicker.ImagePickerAsset[]>([]);
+export function CreateAd({ navigation, route }: ScreenProps) {
+  const { mode, adId } = route.params;
+  const [adImages, setAdImages] = useState<AppImagesList[]>([]);
   const [acceptTrade, setAcceptTrade] = useState(true);
-  const [payMethods, setPayMethods] = useState([]);
+  const [payMethods, setPayMethods] = useState<string[]>([]);
   const [condition, setCondition] = useState("NEW");
   const [isLoading, setIsLoading] = useState(false);
 
-  const navigation = useNavigation<AppNavigationRoutesProps>();
   const theme = useTheme();
   const toast = useToast();
   const {
     control,
     handleSubmit,
+    setValue,
     formState: { errors },
   } = useForm<FormDataProps>({
     resolver: yupResolver(formValidation),
@@ -69,11 +80,17 @@ export function CreateAd() {
 
     if (selectedImages.canceled) return;
 
-    setAdImages((act) => [...act, selectedImages.assets[0]]);
+    const newImage: AppImagesList = {
+      id: selectedImages.assets[0].uri,
+      path: selectedImages.assets[0].uri,
+      local: true,
+    };
+
+    setAdImages([...adImages, newImage]);
   }
 
   function handleRemoveImage(uri: string) {
-    const filtered = adImages.filter((img) => img.uri !== uri);
+    const filtered = adImages.filter((img) => img.path !== uri);
     setAdImages(filtered);
   }
 
@@ -85,7 +102,7 @@ export function CreateAd() {
     setAcceptTrade((a) => !a);
   }
 
-  async function handlePreviewAd({ name, description, price }: FormDataProps) {
+  async function handleSaveAd({ name, description, price }: FormDataProps) {
     if (payMethods.length === 0)
       return toast.show({
         title: "Selecione pelo menos uma condição de pagamento.",
@@ -104,36 +121,57 @@ export function CreateAd() {
 
     setIsLoading(true);
     try {
-      const response = await api.post("/products", {
-        name,
-        description,
-        price: +price,
-        accept_trade: acceptTrade,
-        is_new: condition === "NEW" ? true : false,
-        payment_methods: payMethods,
-      });
+      let response;
 
-      const uploadData = new FormData();
-      adImages.forEach((img) => {
-        const imageFileExtension = img.uri.split(".").pop();
-        const imageFile = {
-          name: `${name}.${imageFileExtension}`.toLowerCase(),
-          uri: img.uri,
-          type: `image/${imageFileExtension}`,
-        } as any;
-        uploadData.append("images", imageFile);
-      });
-      uploadData.append("product_id", response.data.id);
+      if (mode === "new") {
+        response = await api.post("/products", {
+          name,
+          description,
+          price: +price,
+          accept_trade: acceptTrade,
+          is_new: condition === "NEW" ? true : false,
+          payment_methods: payMethods,
+        });
+      } else {
+        response = await api.put(`/products/${adId}`, {
+          name,
+          description,
+          price: +price,
+          accept_trade: acceptTrade,
+          is_new: condition === "NEW" ? true : false,
+          payment_methods: payMethods,
+        });
+      }
 
-      const uploadResponse = await api.post("products/images", uploadData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      });
+      if (adImages.filter((img) => img.local === true).length > 0) {
+        const uploadData = new FormData();
+        adImages
+          .filter((img) => img.local === true)
+          .forEach((img) => {
+            const imageFileExtension = img.path.split(".").pop();
+            const imageFile = {
+              name: `${name}.${imageFileExtension}`.toLowerCase(),
+              uri: img.path,
+              type: `image/${imageFileExtension}`,
+            } as any;
+            uploadData.append("images", imageFile);
+          });
+
+        uploadData.append(
+          "product_id",
+          mode === "new" ? response.data.id : adId
+        );
+
+        const uploadResponse = await api.post("products/images", uploadData, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        });
+      }
 
       navigation.navigate("adDetails", {
         mode: "preview",
-        adId: response.data.id,
+        adId: mode === "new" ? response.data.id : adId,
       });
     } catch (error) {
       console.log({ error });
@@ -147,6 +185,52 @@ export function CreateAd() {
       setIsLoading(false);
     }
   }
+
+  async function loadAd() {
+    if (mode !== "edit") {
+      setAdImages([]);
+      setPayMethods([]);
+      setCondition("NEW");
+      setAcceptTrade(false);
+      return;
+    }
+    setIsLoading(true);
+
+    try {
+      const response = await api.get(`/products/${adId}`);
+      const adData: IProductDTO = response.data;
+
+      setAdImages(response.data.product_images);
+
+      setValue("name", adData.name);
+      setValue("description", adData.description);
+      setValue("price", `${adData.price}`);
+
+      setPayMethods(adData.payment_methods.map((p) => p.key));
+      setAcceptTrade(adData.accept_trade);
+      setCondition(adData.is_new ? "NEW" : "USED");
+    } catch (error) {
+      console.log({ error });
+      return toast.show({
+        title: "Algo errado ao recuperar o anúncio.",
+        placement: "top",
+        bgColor: "red.500",
+        duration: 6500,
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
+  useEffect(() => {
+    loadAd();
+  }, []);
+
+  useFocusEffect(
+    useCallback(() => {
+      loadAd();
+    }, [route])
+  );
 
   return (
     <>
@@ -175,14 +259,16 @@ export function CreateAd() {
 
         <HStack mt="3">
           {adImages.map((img) => (
-            <Box key={img.uri}>
+            <Box key={img.path}>
               <Image
                 alt="user product image"
                 w={100}
                 h={100}
                 resizeMode="cover"
                 source={{
-                  uri: img.uri,
+                  uri: img.local
+                    ? img.path
+                    : `http://192.168.15.20:3333/images/${img.path}`,
                 }}
                 borderRadius={6}
                 mr={4}
@@ -196,7 +282,7 @@ export function CreateAd() {
                 backgroundColor="white"
                 borderRadius="full"
               >
-                <TouchableOpacity onPress={() => handleRemoveImage(img.uri)}>
+                <TouchableOpacity onPress={() => handleRemoveImage(img.path)}>
                   <XCircle
                     weight="fill"
                     size={20}
@@ -382,7 +468,7 @@ export function CreateAd() {
           title="Avançar"
           width={160}
           variant="dark"
-          onPress={handleSubmit(handlePreviewAd)}
+          onPress={handleSubmit(handleSaveAd)}
           isLoading={isLoading}
         />
       </HStack>

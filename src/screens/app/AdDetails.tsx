@@ -5,7 +5,7 @@ import { UserAvatar } from "@components/UserAvatar";
 import { IProductDTO } from "@dtos/IProductDTO";
 import { CommonActions, useFocusEffect } from "@react-navigation/native";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
-import { AdsRoutes } from "@routes/ads.routes";
+import { AppRoutes } from "@routes/app.routes";
 import { api } from "@services/api";
 import {
   Box,
@@ -22,21 +22,40 @@ import { useCallback, useEffect, useState } from "react";
 import { TouchableOpacity } from "react-native";
 import { getStatusBarHeight } from "react-native-iphone-x-helper";
 
-type ScreenProps = NativeStackScreenProps<AdsRoutes, "adDetails">;
+type ScreenProps = NativeStackScreenProps<AppRoutes, "adDetails">;
 
 export function AdDetails({ navigation, route }: ScreenProps) {
   const { mode, adId } = route.params;
   const [adData, setAdData] = useState<IProductDTO | undefined>(undefined);
+  const [isActive, setIsActive] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
   const toast = useToast();
+
+  async function handleToggleActive() {
+    setIsLoading(true);
+    try {
+      const request = api.patch(`/products/${adData!.id}`, {
+        is_active: isActive ? false : true,
+      });
+      setIsActive((a) => !a);
+    } catch (error) {
+      console.log({ error });
+      return toast.show({
+        title: "Algo errado ao salvar o anúncio.",
+        placement: "top",
+        bgColor: "red.500",
+        duration: 6500,
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  }
 
   async function handlePublishAd() {
     setIsLoading(true);
     try {
       const request = api.patch(`/products/${adData!.id}`, { is_active: true });
-
-      console.log({ request });
 
       navigation.dispatch(
         CommonActions.reset({
@@ -56,12 +75,12 @@ export function AdDetails({ navigation, route }: ScreenProps) {
   }
 
   async function loadAd() {
-    console.log({ message: "loading ad", ad: adId });
     setIsLoading(true);
     try {
       const response = await api.get(`/products/${adId}`);
 
       setAdData(response.data);
+      setIsActive(response.data.is_active);
     } catch (error) {
       console.log({ error });
       return toast.show({
@@ -70,9 +89,8 @@ export function AdDetails({ navigation, route }: ScreenProps) {
         bgColor: "red.500",
         duration: 6500,
       });
-    } finally {
-      setIsLoading(false);
     }
+    setIsLoading(false);
   }
 
   useEffect(() => {
@@ -119,7 +137,14 @@ export function AdDetails({ navigation, route }: ScreenProps) {
             </TouchableOpacity>
           </Box>
           <Box mt={getStatusBarHeight() + 36}>
-            <TouchableOpacity onPress={() => navigation.goBack()}>
+            <TouchableOpacity
+              onPress={() =>
+                navigation.navigate("createAd", {
+                  mode: "edit",
+                  adId,
+                })
+              }
+            >
               <PencilSimpleLine />
             </TouchableOpacity>
           </Box>
@@ -140,7 +165,19 @@ export function AdDetails({ navigation, route }: ScreenProps) {
         </HStack>
       )}
 
-      <AdImagesList images={adData?.product_images!} />
+      <AdImagesList images={adData?.product_images!} isActive={isActive} />
+      {/* {!isActive && (
+        <Box
+          position="absolute"
+          w={Dimensions.get("window").width}
+          h={280}
+          opacity={0.5}
+          zIndex={3}
+          backgroundColor="black"
+        >
+          <Text>Anúncio desativado</Text>
+        </Box>
+      )} */}
 
       <ScrollView
         contentContainerStyle={{ flexGrow: 1 }}
@@ -213,7 +250,7 @@ export function AdDetails({ navigation, route }: ScreenProps) {
           />
         </HStack>
       )}
-      {mode !== "preview" && (
+      {mode === "detail" && (
         <HStack
           h="90"
           backgroundColor="white"
@@ -226,6 +263,22 @@ export function AdDetails({ navigation, route }: ScreenProps) {
           </Text>
           <GenericButton title="Entrar em Contato" width={169} />
         </HStack>
+      )}
+      {mode === "owner" && (
+        <VStack
+          h={110}
+          backgroundColor="white"
+          alignItems="center"
+          px={10}
+          py="3"
+        >
+          <GenericButton
+            title={isActive ? "Desativar anúncio" : "Reativar anúncio"}
+            variant={isActive ? "dark" : "solid"}
+            onPress={handleToggleActive}
+          />
+          <GenericButton title="Excluir anúncio" mt="2" variant="light" />
+        </VStack>
       )}
     </>
   );
