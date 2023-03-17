@@ -89,9 +89,8 @@ export function AdDetails({ navigation, route }: ScreenProps) {
         bgColor: "red.500",
         duration: 6500,
       });
-    } finally {
-      setIsLoading(false);
     }
+    setIsLoading(false);
   }
 
   useEffect(() => {
