@@ -1,4 +1,4 @@
-import { Box, FlatList, HStack, Image } from "native-base";
+import { Box, FlatList, HStack, Image, Text } from "native-base";
 import { useCallback, useState } from "react";
 import { Dimensions, ListRenderItem, ViewToken } from "react-native";
 
@@ -43,33 +43,51 @@ export function AdImagesList({ images, isActive }: AdImagesListProps) {
   );
 
   return (
-    <Box>
-      <FlatList
-        showsHorizontalScrollIndicator={false}
-        backgroundColor="red.300"
-        horizontal
-        data={images}
-        keyExtractor={(item) => item.id}
-        renderItem={renderItem}
-        decelerationRate="fast"
-        snapToInterval={Dimensions.get("window").width}
-        onViewableItemsChanged={onViewChangeCallback}
-      />
-      <HStack alignItems="center" justifyContent="center" ml={2}>
-        {images.map((img, i) => (
+    <>
+      <Box>
+        <FlatList
+          showsHorizontalScrollIndicator={false}
+          backgroundColor="red.300"
+          horizontal
+          data={images}
+          keyExtractor={(item) => item.id}
+          renderItem={renderItem}
+          decelerationRate="fast"
+          snapToInterval={Dimensions.get("window").width}
+          onViewableItemsChanged={onViewChangeCallback}
+        />
+        <HStack alignItems="center" justifyContent="center" ml={2}>
+          {images.map((img, i) => (
+            <Box
+              key={img.id}
+              position="absolute"
+              left={imageIndexWidth * i}
+              bottom={1}
+              h={1}
+              w={imageIndexWidth - 10}
+              borderRadius="full"
+              backgroundColor="gray.200"
+              opacity={i === viewIndex ? 0.8 : 0.5}
+            />
+          ))}
+        </HStack>
+        {!isActive && (
           <Box
-            key={img.id}
             position="absolute"
-            left={imageIndexWidth * i}
-            bottom={1}
-            h={1}
-            w={imageIndexWidth - 10}
-            borderRadius="full"
-            backgroundColor="gray.200"
-            opacity={i === viewIndex ? 0.8 : 0.5}
-          />
-        ))}
-      </HStack>
-    </Box>
+            w={Dimensions.get("window").width}
+            h={280}
+            opacity={0.5}
+            zIndex={3}
+            backgroundColor="black"
+            alignItems="center"
+            justifyContent="center"
+          >
+            <Text color="white" opacity={1} fontSize="2xl" fontFamily="heading">
+              ANÚNCIO DESATIVADO
+            </Text>
+          </Box>
+        )}
+      </Box>
+    </>
   );
 }

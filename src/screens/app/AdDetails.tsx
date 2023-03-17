@@ -166,6 +166,18 @@ export function AdDetails({ navigation, route }: ScreenProps) {
       )}
 
       <AdImagesList images={adData?.product_images!} isActive={isActive} />
+      {/* {!isActive && (
+        <Box
+          position="absolute"
+          w={Dimensions.get("window").width}
+          h={280}
+          opacity={0.5}
+          zIndex={3}
+          backgroundColor="black"
+        >
+          <Text>Anúncio desativado</Text>
+        </Box>
+      )} */}
 
       <ScrollView
         contentContainerStyle={{ flexGrow: 1 }}
