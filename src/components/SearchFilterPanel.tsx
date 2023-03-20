@@ -14,9 +14,20 @@ import { useState } from "react";
 import { TouchableOpacity } from "react-native";
 import { GenericButton } from "./GenericButton";
 
-export function SearchFilterPanel() {
+export type FilterProps = {
+  conditions: string[];
+  acceptTrade: boolean;
+  payMethods: string[];
+};
+
+type SearchFilterPanelProps = {
+  onApplyFilter: (filterData: FilterProps) => void;
+};
+
+export function SearchFilterPanel({ onApplyFilter }: SearchFilterPanelProps) {
   const theme = useTheme();
 
+  //FIXME: change to 'new' and 'used'
   const [conditions, setConditions] = useState(["USADO", "NOVO"]);
 
   const [acceptTrade, setAcceptTrade] = useState(true);
@@ -43,6 +54,16 @@ export function SearchFilterPanel() {
     setAcceptTrade(false);
     setPayMethods([]);
     setConditions([]);
+  }
+
+  function handleApplyFilters() {
+    const filters: FilterProps = {
+      acceptTrade,
+      conditions,
+      payMethods,
+    };
+
+    onApplyFilter(filters);
   }
 
   return (
@@ -160,7 +181,11 @@ export function SearchFilterPanel() {
           />
         </Box>
         <Box w="48%" ml="2">
-          <GenericButton title="Aplicar filtros" variant="dark" />
+          <GenericButton
+            title="Aplicar filtros"
+            variant="dark"
+            onPress={handleApplyFilters}
+          />
         </Box>
       </HStack>
     </FormControl>

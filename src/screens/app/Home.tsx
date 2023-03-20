@@ -1,6 +1,6 @@
 import { AdCard } from "@components/AdCard";
 import { GenericButton } from "@components/GenericButton";
-import { SearchFilterPanel } from "@components/SearchFilterPanel";
+import { FilterProps, SearchFilterPanel } from "@components/SearchFilterPanel";
 import { UserAvatar } from "@components/UserAvatar";
 import { IProductDTO } from "@dtos/IProductDTO";
 import BottomSheet from "@gorhom/bottom-sheet";
@@ -51,6 +51,15 @@ export function Home() {
       sheetRef.current?.close();
       setFilterModalShown(false);
     }
+  }
+
+  async function applyFilters({
+    conditions,
+    acceptTrade,
+    payMethods,
+  }: FilterProps) {
+    console.log({ conditions, acceptTrade, payMethods });
+    //NEXT: make filters work
   }
 
   async function loadAds() {
@@ -203,7 +212,7 @@ export function Home() {
         enablePanDownToClose={true}
         onChange={handleShowModal}
       >
-        <SearchFilterPanel />
+        <SearchFilterPanel onApplyFilter={applyFilters} />
       </BottomSheet>
     </>
   );
