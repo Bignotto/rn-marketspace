@@ -59,7 +59,21 @@ export function Home() {
     payMethods,
   }: FilterProps) {
     console.log({ conditions, acceptTrade, payMethods });
-    //NEXT: make filters work
+    setIsLoading(true);
+    //NEXT: finish filters parameters!!
+    try {
+      const response = await api.get("/products", {
+        params: {
+          accept_trade: acceptTrade,
+          payment_methods: payMethods,
+        },
+      });
+      setAds(response.data);
+    } catch (error) {
+      console.log({ error });
+    } finally {
+      setIsLoading(false);
+    }
   }
 
   async function loadAds() {

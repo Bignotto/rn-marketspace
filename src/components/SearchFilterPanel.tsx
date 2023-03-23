@@ -163,7 +163,7 @@ export function SearchFilterPanel({ onApplyFilter }: SearchFilterPanelProps) {
             <Checkbox value="pix" size="md" mt="2" colorScheme="blue">
               Pix
             </Checkbox>
-            <Checkbox value="cc" size="md" mt="2" colorScheme="blue">
+            <Checkbox value="card" size="md" mt="2" colorScheme="blue">
               Cartão de Crédito
             </Checkbox>
             <Checkbox value="deposito" size="md" mt="2" colorScheme="blue">
