@@ -36,6 +36,7 @@ export function Home() {
   const { user } = useAuth();
 
   const [ads, setAds] = useState<IProductDTO[]>([]);
+  const [query, setQuery] = useState<string>();
   const [isLoading, setIsLoading] = useState(true);
 
   const [filterModalShown, setFilterModalShown] = useState(true);
@@ -60,15 +61,26 @@ export function Home() {
   }: FilterProps) {
     console.log({ conditions, acceptTrade, payMethods });
     setIsLoading(true);
-    //NEXT: finish filters parameters!!
     try {
+      let isNew = undefined;
+
+      if (conditions.includes("NEW")) isNew = true;
+      if (conditions.includes("USED")) isNew = false;
+
+      if (conditions.length === 2 || conditions.length === 0) isNew = undefined;
+
       const response = await api.get("/products", {
         params: {
           accept_trade: acceptTrade,
           payment_methods: payMethods,
+          is_new: isNew,
+          query,
         },
       });
       setAds(response.data);
+      setFilterModalShown(false);
+
+      //NEXT: add action to MagnifyingGlass icon
     } catch (error) {
       console.log({ error });
     } finally {
@@ -181,6 +193,8 @@ export function Home() {
             _focus={{
               bgColor: "gray.100",
             }}
+            value={query}
+            onChangeText={setQuery}
           />
           <Box flexDir="row" alignItems="center" mr="3" ml="3">
             <MagnifyingGlass size={20} color={theme.colors.gray[700]} />
