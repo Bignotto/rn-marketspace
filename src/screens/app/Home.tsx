@@ -38,6 +38,7 @@ export function Home() {
   const [ads, setAds] = useState<IProductDTO[]>([]);
   const [query, setQuery] = useState<string>();
   const [isLoading, setIsLoading] = useState(true);
+  const [filters, setFilters] = useState<FilterProps>({} as FilterProps);
 
   const [filterModalShown, setFilterModalShown] = useState(true);
 
@@ -54,21 +55,49 @@ export function Home() {
     }
   }
 
-  async function applyFilters({
+  async function handleSearch() {
+    if (!filters.acceptTrade) {
+      await applyFilters(undefined, undefined, undefined);
+      return;
+    }
+
+    //TODO: fix isNew code
+    let isNew = undefined;
+
+    if (filters.conditions.includes("NEW")) isNew = true;
+    if (filters.conditions.includes("USED")) isNew = false;
+
+    if (filters.conditions.length === 2 || filters.conditions.length === 0)
+      isNew = undefined;
+
+    await applyFilters(isNew, filters.acceptTrade, filters.payMethods);
+  }
+
+  async function handleApplyFilters({
     conditions,
     acceptTrade,
     payMethods,
   }: FilterProps) {
-    console.log({ conditions, acceptTrade, payMethods });
+    setFilters({ acceptTrade, conditions, payMethods });
+
+    let isNew = undefined;
+
+    if (conditions.includes("NEW")) isNew = true;
+    if (conditions.includes("USED")) isNew = false;
+
+    if (conditions.length === 2 || conditions.length === 0) isNew = undefined;
+
+    await applyFilters(isNew, acceptTrade, payMethods);
+  }
+
+  async function applyFilters(
+    isNew: boolean | undefined = undefined,
+    acceptTrade: boolean | undefined = undefined,
+    payMethods: string[] | undefined = undefined
+  ) {
     setIsLoading(true);
+
     try {
-      let isNew = undefined;
-
-      if (conditions.includes("NEW")) isNew = true;
-      if (conditions.includes("USED")) isNew = false;
-
-      if (conditions.length === 2 || conditions.length === 0) isNew = undefined;
-
       const response = await api.get("/products", {
         params: {
           accept_trade: acceptTrade,
@@ -79,8 +108,6 @@ export function Home() {
       });
       setAds(response.data);
       setFilterModalShown(false);
-
-      //NEXT: add action to MagnifyingGlass icon
     } catch (error) {
       console.log({ error });
     } finally {
@@ -197,7 +224,9 @@ export function Home() {
             onChangeText={setQuery}
           />
           <Box flexDir="row" alignItems="center" mr="3" ml="3">
-            <MagnifyingGlass size={20} color={theme.colors.gray[700]} />
+            <TouchableOpacity onPress={handleSearch}>
+              <MagnifyingGlass size={20} color={theme.colors.gray[700]} />
+            </TouchableOpacity>
             <Box borderWidth={1} borderColor="gray.500" h="50%" ml="3" mr="3" />
             <TouchableOpacity onPress={handleShowModal}>
               <Sliders size={20} color={theme.colors.gray[700]} />
@@ -240,7 +269,7 @@ export function Home() {
         enablePanDownToClose={true}
         onChange={handleShowModal}
       >
-        <SearchFilterPanel onApplyFilter={applyFilters} />
+        <SearchFilterPanel onApplyFilter={handleApplyFilters} />
       </BottomSheet>
     </>
   );
