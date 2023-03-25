@@ -14,15 +14,25 @@ import { useState } from "react";
 import { TouchableOpacity } from "react-native";
 import { GenericButton } from "./GenericButton";
 
-export function SearchFilterPanel() {
+export type FilterProps = {
+  conditions: string[];
+  acceptTrade: boolean;
+  payMethods: string[];
+};
+
+type SearchFilterPanelProps = {
+  onApplyFilter: (filterData: FilterProps) => void;
+};
+
+export function SearchFilterPanel({ onApplyFilter }: SearchFilterPanelProps) {
   const theme = useTheme();
 
-  const [conditions, setConditions] = useState(["USADO", "NOVO"]);
+  const [conditions, setConditions] = useState(["USED", "NEW"]);
 
   const [acceptTrade, setAcceptTrade] = useState(true);
   const [payMethods, setPayMethods] = useState([]);
 
-  function toggleCondition(val: "USADO" | "NOVO") {
+  function toggleCondition(val: "USED" | "NEW") {
     if (conditions.includes(val)) {
       setConditions((c) => c.filter((v) => v !== val));
       return;
@@ -45,6 +55,16 @@ export function SearchFilterPanel() {
     setConditions([]);
   }
 
+  function handleApplyFilters() {
+    const filters: FilterProps = {
+      acceptTrade,
+      conditions,
+      payMethods,
+    };
+
+    onApplyFilter(filters);
+  }
+
   return (
     <FormControl flex={1} px={10}>
       <VStack alignItems="flex-start" flex={1}>
@@ -55,11 +75,11 @@ export function SearchFilterPanel() {
           Condição
         </Text>
         <HStack>
-          <TouchableOpacity onPress={() => toggleCondition("USADO")}>
+          <TouchableOpacity onPress={() => toggleCondition("USED")}>
             <Center
               h="7"
               backgroundColor={
-                conditions.includes("USADO") ? "blue.400" : "gray.200"
+                conditions.includes("USED") ? "blue.400" : "gray.200"
               }
               px="4"
               borderRadius="full"
@@ -68,11 +88,11 @@ export function SearchFilterPanel() {
               <Text
                 fontSize="md"
                 fontWeight="bold"
-                color={conditions.includes("USADO") ? "white" : "gray.500"}
+                color={conditions.includes("USED") ? "white" : "gray.500"}
               >
                 USADO
               </Text>
-              {conditions.includes("USADO") && (
+              {conditions.includes("USED") && (
                 <XCircle
                   weight="fill"
                   color={theme.colors.gray[200]}
@@ -86,13 +106,13 @@ export function SearchFilterPanel() {
             </Center>
           </TouchableOpacity>
           <TouchableOpacity
-            onPress={() => toggleCondition("NOVO")}
+            onPress={() => toggleCondition("NEW")}
             style={{ marginLeft: 8 }}
           >
             <Center
               h="7"
               backgroundColor={
-                conditions.includes("NOVO") ? "blue.400" : "gray.200"
+                conditions.includes("NEW") ? "blue.400" : "gray.200"
               }
               px="4"
               borderRadius="full"
@@ -101,11 +121,11 @@ export function SearchFilterPanel() {
               <Text
                 fontSize="md"
                 fontWeight="bold"
-                color={conditions.includes("NOVO") ? "white" : "gray.500"}
+                color={conditions.includes("NEW") ? "white" : "gray.500"}
               >
                 NOVO
               </Text>
-              {conditions.includes("NOVO") && (
+              {conditions.includes("NEW") && (
                 <XCircle
                   weight="fill"
                   color={theme.colors.gray[200]}
@@ -142,7 +162,7 @@ export function SearchFilterPanel() {
             <Checkbox value="pix" size="md" mt="2" colorScheme="blue">
               Pix
             </Checkbox>
-            <Checkbox value="cc" size="md" mt="2" colorScheme="blue">
+            <Checkbox value="card" size="md" mt="2" colorScheme="blue">
               Cartão de Crédito
             </Checkbox>
             <Checkbox value="deposito" size="md" mt="2" colorScheme="blue">
@@ -160,7 +180,11 @@ export function SearchFilterPanel() {
           />
         </Box>
         <Box w="48%" ml="2">
-          <GenericButton title="Aplicar filtros" variant="dark" />
+          <GenericButton
+            title="Aplicar filtros"
+            variant="dark"
+            onPress={handleApplyFilters}
+          />
         </Box>
       </HStack>
     </FormControl>

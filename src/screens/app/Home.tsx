@@ -1,6 +1,6 @@
 import { AdCard } from "@components/AdCard";
 import { GenericButton } from "@components/GenericButton";
-import { SearchFilterPanel } from "@components/SearchFilterPanel";
+import { FilterProps, SearchFilterPanel } from "@components/SearchFilterPanel";
 import { UserAvatar } from "@components/UserAvatar";
 import { IProductDTO } from "@dtos/IProductDTO";
 import BottomSheet from "@gorhom/bottom-sheet";
@@ -36,7 +36,9 @@ export function Home() {
   const { user } = useAuth();
 
   const [ads, setAds] = useState<IProductDTO[]>([]);
+  const [query, setQuery] = useState<string>();
   const [isLoading, setIsLoading] = useState(true);
+  const [filters, setFilters] = useState<FilterProps>({} as FilterProps);
 
   const [filterModalShown, setFilterModalShown] = useState(true);
 
@@ -50,6 +52,66 @@ export function Home() {
     if (filterModalShown) {
       sheetRef.current?.close();
       setFilterModalShown(false);
+    }
+  }
+
+  async function handleSearch() {
+    if (!filters.acceptTrade) {
+      await applyFilters(undefined, undefined, undefined);
+      return;
+    }
+
+    //TODO: fix isNew code
+    let isNew = undefined;
+
+    if (filters.conditions.includes("NEW")) isNew = true;
+    if (filters.conditions.includes("USED")) isNew = false;
+
+    if (filters.conditions.length === 2 || filters.conditions.length === 0)
+      isNew = undefined;
+
+    await applyFilters(isNew, filters.acceptTrade, filters.payMethods);
+  }
+
+  async function handleApplyFilters({
+    conditions,
+    acceptTrade,
+    payMethods,
+  }: FilterProps) {
+    setFilters({ acceptTrade, conditions, payMethods });
+
+    let isNew = undefined;
+
+    if (conditions.includes("NEW")) isNew = true;
+    if (conditions.includes("USED")) isNew = false;
+
+    if (conditions.length === 2 || conditions.length === 0) isNew = undefined;
+
+    await applyFilters(isNew, acceptTrade, payMethods);
+  }
+
+  async function applyFilters(
+    isNew: boolean | undefined = undefined,
+    acceptTrade: boolean | undefined = undefined,
+    payMethods: string[] | undefined = undefined
+  ) {
+    setIsLoading(true);
+
+    try {
+      const response = await api.get("/products", {
+        params: {
+          accept_trade: acceptTrade,
+          payment_methods: payMethods,
+          is_new: isNew,
+          query,
+        },
+      });
+      setAds(response.data);
+      setFilterModalShown(false);
+    } catch (error) {
+      console.log({ error });
+    } finally {
+      setIsLoading(false);
     }
   }
 
@@ -158,9 +220,13 @@ export function Home() {
             _focus={{
               bgColor: "gray.100",
             }}
+            value={query}
+            onChangeText={setQuery}
           />
           <Box flexDir="row" alignItems="center" mr="3" ml="3">
-            <MagnifyingGlass size={20} color={theme.colors.gray[700]} />
+            <TouchableOpacity onPress={handleSearch}>
+              <MagnifyingGlass size={20} color={theme.colors.gray[700]} />
+            </TouchableOpacity>
             <Box borderWidth={1} borderColor="gray.500" h="50%" ml="3" mr="3" />
             <TouchableOpacity onPress={handleShowModal}>
               <Sliders size={20} color={theme.colors.gray[700]} />
@@ -203,7 +269,7 @@ export function Home() {
         enablePanDownToClose={true}
         onChange={handleShowModal}
       >
-        <SearchFilterPanel />
+        <SearchFilterPanel onApplyFilter={handleApplyFilters} />
       </BottomSheet>
     </>
   );
