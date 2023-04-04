@@ -83,9 +83,8 @@ export function AdCard({
         w={153}
         borderRadius={6}
         alt="ad product image"
-        //TODO: FIX IMAGE URI!!!
         source={{
-          uri: `http://192.168.15.20:3333/images/${image_uri}`,
+          uri: `${process.env.APP_API_URL}/images/${image_uri}`,
         }}
       />
       <Text fontSize="sm" color="gray.600" numberOfLines={1}>
