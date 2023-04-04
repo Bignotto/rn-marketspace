@@ -268,7 +268,7 @@ export function CreateAd({ navigation, route }: ScreenProps) {
                 source={{
                   uri: img.local
                     ? img.path
-                    : `http://192.168.15.20:3333/images/${img.path}`,
+                    : `${process.env.APP_API_URL}/images/${img.path}`,
                 }}
                 borderRadius={6}
                 mr={4}

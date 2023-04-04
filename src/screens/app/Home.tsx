@@ -11,12 +11,12 @@ import { api } from "@services/api";
 import {
   Box,
   FlatList,
-  Heading,
   HStack,
+  Heading,
   Input,
   Text,
-  useTheme,
   VStack,
+  useTheme,
 } from "native-base";
 import {
   ArrowRight,
@@ -138,7 +138,7 @@ export function Home() {
         <HStack mt={getStatusBarHeight() + 20} justifyContent="space-between">
           <HStack w="60%">
             <UserAvatar
-              avatar_uri={`http://192.168.15.20:3333/images/${user.avatar}`}
+              avatar_uri={`${process.env.APP_API_URL}/images/${user.avatar}`}
               size={45}
             />
             <Box ml="2">
@@ -256,7 +256,7 @@ export function Home() {
               name={item.name}
               price={`R$ ${item.price}`}
               showAvatar
-              avatarUri={`http://192.168.15.20:3333/images/${item.user?.avatar}`}
+              avatarUri={`${process.env.APP_API_URL}/images/${item.user?.avatar}`}
               isNew={item.is_new}
             />
           </TouchableOpacity>
