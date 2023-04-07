@@ -1,4 +1,7 @@
-import { storageAuthTokenGet } from "@storage/storageAuth";
+import {
+  storageAuthTokenGet,
+  storageAuthTokenSave,
+} from "@storage/storageAuth";
 import { AppError } from "@utils/AppError";
 import axios, { AxiosError, AxiosInstance } from "axios";
 
@@ -24,12 +27,14 @@ api.registerInterceptorTokenManager = (signOut) => {
   const interceptTokenManager = api.interceptors.response.use(
     (response) => response,
     async (requestError) => {
+      console.log(requestError);
       if (requestError?.response?.status === 401) {
         if (
           requestError.response.data?.message === "token.expired" ||
           requestError.response.data?.message === "token.invalid"
         ) {
           const { refresh_token } = await storageAuthTokenGet();
+          console.log("token token token", refresh_token);
           if (!refresh_token) {
             signOut();
             return Promise.reject(requestError);
@@ -51,10 +56,55 @@ api.registerInterceptorTokenManager = (signOut) => {
             });
           }
           isRefreshing = true;
-          //NEXT: process request queue
+
+          return new Promise(async (resolve, reject) => {
+            try {
+              const { data } = await api.post("/sessions/refresh-token", {
+                refresh_token,
+              });
+
+              console.log({ data });
+
+              await storageAuthTokenSave({
+                refresh_token: data.refresh_token,
+                token: data.token,
+              });
+
+              if (originalRequest.data) {
+                originalRequest.data = JSON.parse(originalRequest.data);
+              }
+
+              originalRequest.headers = {
+                Authorization: `Bearer ${data.token}`,
+              };
+              api.defaults.headers.common[
+                "Authorization"
+              ] = `Bearer ${data.token}`;
+
+              requestQueue.forEach((req) => {
+                req.onSuccess(data.token);
+              });
+
+              console.log("Token REFRESHED!");
+
+              resolve(api(originalRequest));
+            } catch (error: any) {
+              requestQueue.forEach((req) => {
+                req.onFailure(error);
+              });
+
+              signOut();
+              reject(error);
+            } finally {
+              isRefreshing = false;
+              requestQueue = [];
+            }
+          });
         }
         signOut();
       }
+
+      console.log(requestError);
 
       if (requestError.response && requestError.response.data) {
         return Promise.reject(new AppError(requestError.response.data.message));

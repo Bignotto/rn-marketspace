@@ -57,18 +57,6 @@ export function AuthContextProvider({ children }: AuthContextProviderProps) {
     }
   }
 
-  useEffect(() => {
-    refreshUser();
-  }, []);
-
-  useEffect(() => {
-    const subscribe = api.registerInterceptorTokenManager(signOut);
-
-    return () => {
-      subscribe();
-    };
-  }, [signOut]);
-
   async function signIn(email: string, password: string) {
     setIsLoading(true);
     try {
@@ -100,6 +88,18 @@ export function AuthContextProvider({ children }: AuthContextProviderProps) {
       setIsLoading(false);
     }
   }
+
+  useEffect(() => {
+    refreshUser();
+  }, []);
+
+  useEffect(() => {
+    const subscribe = api.registerInterceptorTokenManager(signOut);
+
+    return () => {
+      subscribe();
+    };
+  }, []);
 
   return (
     <AuthContext.Provider
