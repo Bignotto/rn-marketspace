@@ -10,7 +10,7 @@ import {
   storageUserRemove,
   storageUserSave,
 } from "@storage/storageUser";
-import { createContext, ReactNode, useEffect, useState } from "react";
+import { ReactNode, createContext, useEffect, useState } from "react";
 
 export type AuthContextDataProps = {
   user: IUserDTO;
@@ -57,10 +57,6 @@ export function AuthContextProvider({ children }: AuthContextProviderProps) {
     }
   }
 
-  useEffect(() => {
-    refreshUser();
-  }, []);
-
   async function signIn(email: string, password: string) {
     setIsLoading(true);
     try {
@@ -92,6 +88,18 @@ export function AuthContextProvider({ children }: AuthContextProviderProps) {
       setIsLoading(false);
     }
   }
+
+  useEffect(() => {
+    refreshUser();
+  }, []);
+
+  useEffect(() => {
+    const subscribe = api.registerInterceptorTokenManager(signOut);
+
+    return () => {
+      subscribe();
+    };
+  }, []);
 
   return (
     <AuthContext.Provider

@@ -244,7 +244,6 @@ export function Home() {
         renderItem={({ item }) => (
           <TouchableOpacity
             onPress={() => {
-              console.log({ item_id: item.id });
               navigation.navigate("adDetails", {
                 mode: "detail",
                 adId: item.id,
