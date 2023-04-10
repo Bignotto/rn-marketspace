@@ -27,14 +27,12 @@ api.registerInterceptorTokenManager = (signOut) => {
   const interceptTokenManager = api.interceptors.response.use(
     (response) => response,
     async (requestError) => {
-      console.log(requestError);
       if (requestError?.response?.status === 401) {
         if (
           requestError.response.data?.message === "token.expired" ||
           requestError.response.data?.message === "token.invalid"
         ) {
           const { refresh_token } = await storageAuthTokenGet();
-          console.log("token token token", refresh_token);
           if (!refresh_token) {
             signOut();
             return Promise.reject(requestError);

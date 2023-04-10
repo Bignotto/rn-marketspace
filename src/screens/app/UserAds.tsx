@@ -88,7 +88,6 @@ export function UserAds({ navigation, route }: ScreenProps) {
         renderItem={({ item }) => (
           <TouchableOpacity
             onPress={() => {
-              console.log({ item_id: item.id });
               navigation.navigate("adDetails", {
                 mode: "owner",
                 adId: item.id,
