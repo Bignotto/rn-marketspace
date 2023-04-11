@@ -19,7 +19,7 @@ import {
 } from "native-base";
 import { ArrowLeft, PencilSimpleLine } from "phosphor-react-native";
 import { useCallback, useEffect, useState } from "react";
-import { TouchableOpacity } from "react-native";
+import { Linking, TouchableOpacity } from "react-native";
 import { getStatusBarHeight } from "react-native-iphone-x-helper";
 
 type ScreenProps = NativeStackScreenProps<AppRoutes, "adDetails">;
@@ -31,6 +31,10 @@ export function AdDetails({ navigation, route }: ScreenProps) {
   const [isLoading, setIsLoading] = useState(true);
 
   const toast = useToast();
+
+  async function handleContactProvider() {
+    await Linking.openURL(`https://wa.me/55${adData?.user?.tel}`);
+  }
 
   async function handleToggleActive() {
     setIsLoading(true);
@@ -261,7 +265,11 @@ export function AdDetails({ navigation, route }: ScreenProps) {
           <Text fontFamily="heading" fontSize="xl" color="blue.400">
             {`R$ ${adData?.price}`}
           </Text>
-          <GenericButton title="Entrar em Contato" width={169} />
+          <GenericButton
+            title="Entrar em Contato"
+            width={169}
+            onPress={handleContactProvider}
+          />
         </HStack>
       )}
       {mode === "owner" && (
